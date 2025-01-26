@@ -10,7 +10,12 @@ distanza_manhattan((X1, Y1), (X2, Y2), D) :-
 utilita_distanza_nemico_giocatore(Nemico, Giocatore, Utilita) :-
     distanza_manhattan(Nemico, Giocatore, Utilita).
 
-% Funzione di utilità: distanza tra il nemico e il pallino più vicino
-utilita_distanza_nemico_pallino(Nemico, Pallini, DistanzaMinima) :-
-    findall(Distanza, (member(Pallino, Pallini), distanza_manhattan(Nemico, Pallino, Distanza)), Distanze),%genera una lista di distanze tra il nemico e tutti i pallini
-    min_list(Distanze, DistanzaMinima).%trova la distanza minima da quella lista, che rappresenta il pallino più vicino al nemico
+% Funzione di utilità: distanza tra il giocatore e il pallino più vicino
+utilita_distanza_giocatore_pallino(Giocatore, Pallini, PallinoPiuVicino, DistanzaMinima) :-
+    findall((Distanza, Pallino), (member(Pallino, Pallini), distanza_manhattan(Giocatore, Pallino, Distanza)), Coppie),%creo una lista di coppie che mi permette di conservare il riferimento al pallino che corrisponde alla distanza minima.
+    sort(Coppie, [(DistanzaMinima, PallinoPiuVicino)|_]).%ordino la lista in base alla distanza e prendo il il primo elemento che rappresenta il pallino piu vicino
+
+% Funzione di utilità: distanza tra il nemico e il pallino più vicino al giocatore
+utilita_distanza_nemico_pallino(Nemico, Giocatore, Pallini, DistanzaNemicoPallino) :-
+    utilita_distanza_giocatore_pallino(Giocatore, Pallini, PallinoPiuVicino, _),
+    distanza_manhattan(Nemico, PallinoPiuVicino, DistanzaNemicoPallino).%calcolo la distanza tra il pallino piu vicino e il nemico
