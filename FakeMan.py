@@ -1,4 +1,7 @@
+from pyswip import Prolog
 import pygame
+
+
 
 # Inizializza Pygame
 pygame.init()
@@ -29,6 +32,9 @@ pygame.display.set_caption("Griglia con player")
 player_pos = [14,19]  # Riga, Colonna
 enemy_pos = [0,1]
 enemy2_pos = [0,19]
+
+prolog = Prolog()
+prolog.consult("movimentoPupi2.pl")
 
 # Flag per evitare il movimento continuo
 up_pressed = False
@@ -74,6 +80,29 @@ def disegna_griglia():
             else:
                 colore = BIANCO
             pygame.draw.rect(schermo, colore, (x, y, DIM_QUADRATO, DIM_QUADRATO))
+            
+def aggiorna_posizione_nemico():
+    start = f"{enemy_pos[0]}/{enemy_pos[1]}"
+    goal = f"{player_pos[0]}/{player_pos[1]}"
+    query = f"a_star_prima_mossa({start}, {goal}, NextMove)"
+    
+    try:
+        result = list(prolog.query(query))
+        print(f"Risultato da Prolog: {result}")  # Mostra il risultato grezzo
+        if result:
+            next_move = result[0]['NextMove']
+            print(f"NextMove restituito da Prolog: {next_move}")  # Stampa il valore di NextMove
+            
+            # Gestione del parsing della stringa restituita
+            if isinstance(next_move, str):
+                next_x, next_y = map(int, next_move.split('/'))
+                enemy_pos[0], enemy_pos[1] = next_x, next_y
+            else:
+                print(f"Formato non previsto per NextMove: {type(next_move)}")
+        else:
+            print("Prolog non ha restituito alcun risultato.")
+    except Exception as e:
+        print(f"Errore durante la chiamata a Prolog: {e}")
         
                        
 
@@ -92,15 +121,19 @@ while running:
     # Gestione del movimento quando i tasti sono premuti
     if keys[pygame.K_UP] and not up_pressed and player_pos[0] > 0 and labirinto[player_pos[0]-1][player_pos[1]] != 1:
         player_pos[0] -= 1
+        aggiorna_posizione_nemico()
         up_pressed = True  # Set flag per evitare il movimento continuo
     if keys[pygame.K_DOWN] and not down_pressed and player_pos[0] < RIGHE - 1 and labirinto[player_pos[0]+1][player_pos[1]] != 1:
         player_pos[0] += 1
+        aggiorna_posizione_nemico()
         down_pressed = True  # Set flag per evitare il movimento continuo
     if keys[pygame.K_LEFT] and not left_pressed and player_pos[1] > 0 and labirinto[player_pos[0]][player_pos[1]-1] != 1:
         player_pos[1] -= 1
+        aggiorna_posizione_nemico()
         left_pressed = True  # Set flag per evitare il movimento continuo
     if keys[pygame.K_RIGHT] and not right_pressed and player_pos[1] < COLONNE - 1 and labirinto[player_pos[0]][player_pos[1]+1] != 1:
         player_pos[1] += 1
+        aggiorna_posizione_nemico()
         right_pressed = True  # Set flag per evitare il movimento continuo
 
     # Se il tasto viene rilasciato, resettare il flag
@@ -113,9 +146,24 @@ while running:
     if not keys[pygame.K_RIGHT]:
         right_pressed = False
         
+    
     #ENEMY1
         
-        
+
+    # Riempie lo schermo con il colore di sfondo
+    schermo.fill(NERO)
+    #print(player_pos)
+    #print(enemy_pos)
+    # Disegna la griglia
+    disegna_griglia()
+
+    # Aggiorna il display
+    pygame.display.flip()
+
+# Chiudi Pygame
+pygame.quit()
+
+""" 
     if keys[pygame.K_w] and not w_pressed and enemy_pos[0] > 0 and labirinto[enemy_pos[0]-1][enemy_pos[1]] != 1: 
         enemy_pos[0] -= 1
         w_pressed = True  # Set flag per evitare il movimento continuo
@@ -163,16 +211,4 @@ while running:
         f_pressed = False
     if not keys[pygame.K_h]:
         h_pressed = False   
-    
-
-    # Riempie lo schermo con il colore di sfondo
-    schermo.fill(NERO)
-    print(player_pos)
-    # Disegna la griglia
-    disegna_griglia()
-
-    # Aggiorna il display
-    pygame.display.flip()
-
-# Chiudi Pygame
-pygame.quit()
+    """

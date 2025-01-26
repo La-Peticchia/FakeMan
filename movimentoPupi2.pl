@@ -1,5 +1,3 @@
-
-
 :-use_module(library(pce)).
 :-[mappaprolog2].
 :- use_module(library(pce)).
@@ -47,34 +45,33 @@ disegna_pianta(Finestra, Nome, PlayerPosX/PlayerPosY, EnemyPosX/EnemyPosY) :-
 heuristic(X1/Y1, X2/Y2, H) :-
     H is abs(X1 - X2) + abs(Y1 - Y2).
 
-% Trova il percorso con A*
-a_star(Start, Goal, Path) :-
-    a_star_search([node(Start, 0, 0, [])], [], Goal, Path).
+% Trova la prima mossa valida con A*
+a_star_prima_mossa(Start, Goal, NextMove) :-
+    a_star_search_prima_mossa([node(Start, 0, 0, [])], [], Goal, NextMove).
 
-% Algoritmo A* principale
-a_star_search([node(Pos, _, _, Path)|_], _, Pos, FinalPath) :-
-    reverse([Pos|Path], FinalPath). % Percorso trovato
-a_star_search([node(Pos, G, _, Path)|Open], Closed, Goal, FinalPath) :-
+% Modifica l'algoritmo A* per fermarsi al primo passo
+a_star_search_prima_mossa([node(Pos, _, _, Path)|_], _, Pos, NextMove) :-
+    reverse([Pos|Path], [_, NextMove|_]). % Ritorna solo il primo passo dopo la posizione iniziale
+a_star_search_prima_mossa([node(Pos, G, _, Path)|Open], Closed, Goal, NextMove) :-
     findall(
         node(Next, GNew, F, [Pos|Path]),
-        (   adiacente(Pos, Next, 1), % Trova i vicini
+        (   adiacente(Pos, Next, 1),        % Trova i vicini
             \+ member(node(Next, _, _, _), Closed), % Non deve essere nei chiusi
             \+ member(node(Next, _, _, _), Open),   % Non deve essere negli aperti
-            GNew is G + 1,                         % Incrementa il costo
-            heuristic(Next, Goal, H),              % Calcola l'euristica
-            F is GNew + H                          % Calcola il costo totale
+            GNew is G + 1,                          % Incrementa il costo
+            heuristic(Next, Goal, H),               % Calcola l'euristica
+            F is GNew + H                           % Calcola il costo totale
         ),
         Neighbors
     ),
     append(Open, Neighbors, NewOpen),
     sort(2, @=<, NewOpen, SortedOpen), % Ordina per F (minore è meglio)
-    a_star_search(SortedOpen, [node(Pos, G, _, Path)|Closed], Goal, FinalPath).
+    a_star_search_prima_mossa(SortedOpen, [node(Pos, G, _, Path)|Closed], Goal, NextMove).
+
+
 
 % Adiacenze
 adiacente(X/Y, X1/Y, 1) :- X1 is X + 1, p(X1/Y).
 adiacente(X/Y, X/Y1, 1) :- Y1 is Y + 1, p(X/Y1).
 adiacente(X/Y, X1/Y, 1) :- X1 is X - 1, p(X1/Y).
 adiacente(X/Y, X/Y1, 1) :- Y1 is Y - 1, p(X/Y1).
-
-
-
