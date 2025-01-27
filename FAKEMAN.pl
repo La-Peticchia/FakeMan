@@ -1,5 +1,5 @@
 bianca(0, 1).%nemico 1
-bianca(0, 9).%nemico 2
+bianca(0, 19).%nemico 2
 bianca(14, 9).%giocatore verde
 bianca(1, 1).
 biamca(1, 0).
