@@ -1,5 +1,5 @@
 :-use_module(library(pce)).
-:-[mappa_logica].
+%:-[mappa_logica].
 :-[mappa_grafica].
 :-[rules].
 :-[alphabeta].
@@ -66,7 +66,7 @@ create_objects(Window) :-
     PX is X*20+2.5, PY is Y*20+2.5,
     send(Window, display,Player1, point(PX,PY)),
 
-    Player2 = @p2, X1/Y1 = 13/18,
+    Player2 = @p2, X1/Y1 = 19/14,
     assert(playerPos(Player2, X1/Y1)),
     new(Player2, box(15,15)),
     send(Player2, fill_pattern, colour(red)),
@@ -118,7 +118,7 @@ free_objects(Window) :-
     retractall(ballPos(_,_)).
 
 randomBallPos(X/Y) :-
-    findall(X1/Y1, l(X1/Y1,_), List),
+    findall(X1/Y1, pInv(X1/Y1), List),
     findall(X2/Y2, ballPos(_,X2/Y2),List1),
     findall(X3/Y3, playerPos(_,X3/Y3),List2),
     append(List1,List2,List3),
@@ -133,8 +133,9 @@ elementAtIndex(Index, [_|T], Element) :-
     NewIndex is Index - 1,
     elementAtIndex(NewIndex,T,Element).
 
-asdw(d,X1/Y,X2/Y) :- X2 is X1 + 1, l(X2/Y,_). % verso EST
-asdw(w,X/Y1,X/Y2) :- Y2 is Y1 - 1, l(X/Y2,_). % verso NORD
-asdw(a,X1/Y,X2/Y) :- X2 is X1 - 1, l(X2/Y,_). % verso OVEST
-asdw(s,X/Y1,X/Y2) :- Y2 is Y1 + 1, l(X/Y2,_). % verso SUD
+asdw(d,X1/Y,X2/Y) :- X2 is X1 + 1, pInv(X2/Y). % verso EST
+asdw(w,X/Y1,X/Y2) :- Y2 is Y1 - 1, pInv(X/Y2). % verso NORD
+asdw(a,X1/Y,X2/Y) :- X2 is X1 - 1, pInv(X2/Y). % verso OVEST
+asdw(s,X/Y1,X/Y2) :- Y2 is Y1 + 1, pInv(X/Y2). % verso SUD
+
 
