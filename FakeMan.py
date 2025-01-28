@@ -1,6 +1,7 @@
 from pyswip import Prolog
 import pygame
 import re
+import random
 
 
 # Inizializza Pygame
@@ -26,9 +27,13 @@ VERDE = (0,255,0)
 GIALLO = (255,255,0)
 AZZURRO = (0,255,255)
 
+#Flag
+MONSTER_GENERATION = True
+NUMER_OF_TURN_GENERATION = 7
+
 #booleani per il controllo delle animazioni
 playerDirection = 0 #1 is right || #0 is left
-numeroMosse = 0
+numeroMosse = 0 #contatore mosse
 
 
 #Sprite player
@@ -46,6 +51,10 @@ sprite_enemy2 = pygame.transform.scale(sprite_enemy2, (DIM_QUADRATO, DIM_QUADRAT
 
 sprite_enemy3 = pygame.image.load("immagini/Rosso.png")
 sprite_enemy3 = pygame.transform.scale(sprite_enemy3, (DIM_QUADRATO, DIM_QUADRATO))
+
+#Gruppo per la selezione random degli sprite
+spriteGroup = [sprite_enemy1, sprite_enemy2, sprite_enemy3]
+posGroup = [[0,1],[0,19],[13,0]]
 
 
 # Crea la finestra
@@ -147,7 +156,15 @@ def aggiorna_posizione_nemico(numMosse):
     print(numMosse)
     return numMosse 
 
-    
+def aggiungi_nemico():
+    global nemici
+    nuovo_nemico = {
+        "pos" : random.choice(posGroup),
+        "sprite" : random.choice(spriteGroup),
+        "direction" : 0
+        
+    }
+    nemici.append(nuovo_nemico)
   
 #Funzione per estrarre numeri dalla stringa
 def estrai_numeri(stringa):
@@ -171,17 +188,22 @@ while running:
         player_pos[0] -= 1
         up_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        
+        if MONSTER_GENERATION  and numeroMosse % NUMER_OF_TURN_GENERATION == 0:
+            aggiungi_nemico()
+             
     if keys[pygame.K_DOWN] and not down_pressed and player_pos[0] < RIGHE - 1 and labirinto[player_pos[0]+1][player_pos[1]] != 1:
         player_pos[0] += 1
         down_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        
+        if MONSTER_GENERATION  and numeroMosse % NUMER_OF_TURN_GENERATION == 0:
+            aggiungi_nemico()
+            
     if keys[pygame.K_LEFT] and not left_pressed and player_pos[1] > 0 and labirinto[player_pos[0]][player_pos[1]-1] != 1:
         player_pos[1] -= 1
         left_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        
+        if MONSTER_GENERATION  and numeroMosse % NUMER_OF_TURN_GENERATION == 0:
+            aggiungi_nemico()
         #Gira lo sprite seguendo la direzione
         if playerDirection==1:
             sprite_player = pygame.transform.flip(sprite_player, True, False)
@@ -191,7 +213,9 @@ while running:
         player_pos[1] += 1
         right_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        
+        if MONSTER_GENERATION  and numeroMosse % NUMER_OF_TURN_GENERATION == 0:
+            aggiungi_nemico()
+            
         #Gira lo sprite seguendo la direzione
         if playerDirection==0:
             sprite_player = pygame.transform.flip(sprite_player, True, False)
@@ -224,6 +248,8 @@ while running:
 
 # Chiudi Pygame
 pygame.quit()
+
+
 
 """ 
     if keys[pygame.K_w] and not w_pressed and enemy_pos[0] > 0 and labirinto[enemy_pos[0]-1][enemy_pos[1]] != 1: 
