@@ -1,5 +1,5 @@
 %:-use_module(library(pce)).
-:-[mappaprolog].
+:-[mappaprolog2].
 
 % Disegna la mappa in base ai predicati p/1 (celle valide)
 disegna_pianta(Finestra, Nome, PlayerPosX/PlayerPosY, EnemyPosX/EnemyPosY) :-
