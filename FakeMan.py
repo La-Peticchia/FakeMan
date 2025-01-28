@@ -26,9 +26,28 @@ VERDE = (0,255,0)
 GIALLO = (255,255,0)
 AZZURRO = (0,255,255)
 
+#booleani per il controllo delle animazioni
+playerDirection = 0 #1 is right || #0 is left
+enemy1Direction = 0
+enemy2Direction = 0
+enemy3Direction = 0
+
+#Sprite player
 sprite_player = pygame.image.load("immagini/FakeMan.png")
 sprite_player = pygame.transform.scale(sprite_player, (DIM_QUADRATO, DIM_QUADRATO))
 sprite_player = pygame.transform.flip(sprite_player, True, False)
+
+#Nemico 1
+sprite_enemy1 = pygame.image.load("immagini/Arancione.png")
+sprite_enemy1 = pygame.transform.scale(sprite_enemy1, (DIM_QUADRATO, DIM_QUADRATO))
+
+#Nemico 2
+sprite_enemy2 = pygame.image.load("immagini/Blu.png")
+sprite_enemy2 = pygame.transform.scale(sprite_enemy2, (DIM_QUADRATO, DIM_QUADRATO))
+
+sprite_enemy3 = pygame.image.load("immagini/Rosso.png")
+sprite_enemy3 = pygame.transform.scale(sprite_enemy3, (DIM_QUADRATO, DIM_QUADRATO))
+
 
 # Crea la finestra
 schermo = pygame.display.set_mode((LARGHEZZA_FINESTRA, ALTEZZA_FINESTRA))
@@ -87,17 +106,19 @@ def disegna_griglia():
             if [riga, colonna] == player_pos:
                 schermo.blit(sprite_player, (x, y))
             elif [riga, colonna] == enemy_pos:
-                colore = BLU
+                schermo.blit(sprite_enemy1,(x, y))
             elif [riga,colonna] == enemy2_pos:
-                colore = VERDE
+                 schermo.blit(sprite_enemy2,(x, y))
             elif [riga,colonna] == enemy3_pos:
-                colore = AZZURRO
+                 schermo.blit(sprite_enemy3,(x, y))
             
-                
+  
             
-            
-def aggiorna_posizione_nemico(enemyStart, enemyEnd):
-    start = f"{enemyStart}/{enemyEnd}"
+#Funzione per aggiornare il movimento del nemico
+def aggiorna_posizione_nemico(enemyX, enemyY, enemySprite, enemyDirection):
+    
+    #calcolo della futura direzione
+    start = f"{enemyX}/{enemyY}"
     goal = f"{player_pos[0]}/{player_pos[1]}"
     query = f"a_star_prima_mossa({start}, {goal}, NextMove)"
     
@@ -105,11 +126,24 @@ def aggiorna_posizione_nemico(enemyStart, enemyEnd):
     
     risultato = estrai_numeri(str(result))
     [prologX, prologY] = risultato  
-    return [prologX,prologY]
     
+    #calcolo della direzione dello sprite
+    if enemyY>prologY:
+        if enemyDirection == 0:
+            print("Turn Left!")
+            enemySprite = pygame.transform.flip(enemySprite, True, False)
+            enemyDirection = 1
+    if enemyY<prologY:
+        if enemyDirection == 1:
+            print("Turn Right!")
+            enemySprite = pygame.transform.flip(enemySprite, True, False)
+            enemyDirection = 0
+    
+    return [prologX,prologY], enemySprite, enemyDirection
+
     
   
-                       
+#Funzione per estrarre numeri dalla stringa
 def estrai_numeri(stringa):
     numeri = re.findall(r'\d+', stringa)  # Trova tutti i numeri (sequenze di cifre)
     return [int(n) for n in numeri]
@@ -130,33 +164,45 @@ while running:
     if keys[pygame.K_UP] and not up_pressed and player_pos[0] > 0 and labirinto[player_pos[0]-1][player_pos[1]] != 1:
         player_pos[0] -= 1
         up_pressed = True  # Set flag per evitare il movimento continuo
-        enemy_pos = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1])
-        enemy2_pos = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1])
-        enemy3_pos = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1])
+        
+                
+        enemy_pos, sprite_enemy1, enemy1Direction = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1], sprite_enemy1, enemy1Direction)
+        enemy2_pos, sprite_enemy2, enemy2Direction = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1], sprite_enemy2, enemy2Direction)
+        enemy3_pos, sprite_enemy3, enemy3Direction = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1], sprite_enemy3, enemy3Direction)
         
     if keys[pygame.K_DOWN] and not down_pressed and player_pos[0] < RIGHE - 1 and labirinto[player_pos[0]+1][player_pos[1]] != 1:
         player_pos[0] += 1
         down_pressed = True  # Set flag per evitare il movimento continuo
-        enemy_pos = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1])
-        enemy2_pos = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1])
-        enemy3_pos = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1])
+        enemy_pos, sprite_enemy1, enemy1Direction = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1], sprite_enemy1, enemy1Direction)
+        enemy2_pos, sprite_enemy2, enemy2Direction = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1], sprite_enemy2, enemy2Direction)
+        enemy3_pos, sprite_enemy3, enemy3Direction = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1], sprite_enemy3, enemy3Direction)
+        
         
     if keys[pygame.K_LEFT] and not left_pressed and player_pos[1] > 0 and labirinto[player_pos[0]][player_pos[1]-1] != 1:
         player_pos[1] -= 1
         left_pressed = True  # Set flag per evitare il movimento continuo
-        enemy_pos = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1])
-        enemy2_pos = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1])
-        enemy3_pos = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1])
+        enemy_pos, sprite_enemy1, enemy1Direction = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1], sprite_enemy1, enemy1Direction)
+        enemy2_pos, sprite_enemy2, enemy2Direction = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1], sprite_enemy2, enemy2Direction)
+        enemy3_pos, sprite_enemy3, enemy3Direction = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1], sprite_enemy3, enemy3Direction)
+        
+        #Gira lo sprite seguendo la direzione
+        if playerDirection==1:
+            sprite_player = pygame.transform.flip(sprite_player, True, False)
+            playerDirection = 0
         
     if keys[pygame.K_RIGHT] and not right_pressed and player_pos[1] < COLONNE - 1 and labirinto[player_pos[0]][player_pos[1]+1] != 1:
         player_pos[1] += 1
         right_pressed = True  # Set flag per evitare il movimento continuo
-        enemy_pos = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1])
-        enemy2_pos = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1])
-        enemy3_pos = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1])
+        enemy_pos, sprite_enemy1, enemy1Direction = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1], sprite_enemy1, enemy1Direction)
+        enemy2_pos, sprite_enemy2, enemy2Direction = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1], sprite_enemy2, enemy2Direction)
+        enemy3_pos, sprite_enemy3, enemy3Direction = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1], sprite_enemy3, enemy3Direction)
         
+        #Gira lo sprite seguendo la direzione
+        if playerDirection==0:
+            sprite_player = pygame.transform.flip(sprite_player, True, False)
+            playerDirection = 1
 
-    # Se il tasto viene rilasciato, resettare il flag
+    # Se il tasto viene rilasciato, resettare il flag per il movimento "a casella singola"
     if not keys[pygame.K_UP]:
         up_pressed = False
     if not keys[pygame.K_DOWN]:
