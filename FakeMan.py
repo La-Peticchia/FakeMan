@@ -3,7 +3,6 @@ import pygame
 import re
 
 
-
 # Inizializza Pygame
 pygame.init()
 
@@ -26,6 +25,10 @@ BLU = (0,0,255)
 VERDE = (0,255,0)
 GIALLO = (255,255,0)
 AZZURRO = (0,255,255)
+
+sprite_player = pygame.image.load("immagini/FakeMan.png")
+sprite_player = pygame.transform.scale(sprite_player, (DIM_QUADRATO, DIM_QUADRATO))
+sprite_player = pygame.transform.flip(sprite_player, True, False)
 
 # Crea la finestra
 schermo = pygame.display.set_mode((LARGHEZZA_FINESTRA, ALTEZZA_FINESTRA))
@@ -75,17 +78,23 @@ def disegna_griglia():
             y = riga * (DIM_QUADRATO + OFFSET)
             if labirinto[riga][colonna] == 1:
                 colore = NERO
-            elif [riga, colonna] == player_pos:
-                colore = GIALLO
+                pygame.draw.rect(schermo, colore, (x, y, DIM_QUADRATO, DIM_QUADRATO))
+            
+            else:
+                colore = BIANCO
+                pygame.draw.rect(schermo, colore, (x, y, DIM_QUADRATO, DIM_QUADRATO))    
+                
+            if [riga, colonna] == player_pos:
+                schermo.blit(sprite_player, (x, y))
             elif [riga, colonna] == enemy_pos:
                 colore = BLU
             elif [riga,colonna] == enemy2_pos:
                 colore = VERDE
             elif [riga,colonna] == enemy3_pos:
                 colore = AZZURRO
-            else:
-                colore = BIANCO
-            pygame.draw.rect(schermo, colore, (x, y, DIM_QUADRATO, DIM_QUADRATO))
+            
+                
+            
             
 def aggiorna_posizione_nemico(enemyStart, enemyEnd):
     start = f"{enemyStart}/{enemyEnd}"
