@@ -1,6 +1,6 @@
 from pyswip import Prolog
 import pygame
-
+import re
 
 
 # Inizializza Pygame
@@ -23,6 +23,12 @@ NERO = (0, 0, 0)
 ROSSO = (255, 0, 0)
 BLU = (0,0,255)
 VERDE = (0,255,0)
+GIALLO = (255,255,0)
+AZZURRO = (0,255,255)
+
+sprite_player = pygame.image.load("immagini/FakeMan.png")
+sprite_player = pygame.transform.scale(sprite_player, (DIM_QUADRATO, DIM_QUADRATO))
+sprite_player = pygame.transform.flip(sprite_player, True, False)
 
 # Crea la finestra
 schermo = pygame.display.set_mode((LARGHEZZA_FINESTRA, ALTEZZA_FINESTRA))
@@ -32,6 +38,7 @@ pygame.display.set_caption("Griglia con player")
 player_pos = [14,19]  # Riga, Colonna
 enemy_pos = [0,1]
 enemy2_pos = [0,19]
+enemy3_pos = [13,0]
 
 prolog = Prolog()
 prolog.consult("movimentoPupi2.pl")
@@ -71,40 +78,41 @@ def disegna_griglia():
             y = riga * (DIM_QUADRATO + OFFSET)
             if labirinto[riga][colonna] == 1:
                 colore = NERO
-            elif [riga, colonna] == player_pos:
-                colore = ROSSO
+                pygame.draw.rect(schermo, colore, (x, y, DIM_QUADRATO, DIM_QUADRATO))
+            
+            else:
+                colore = BIANCO
+                pygame.draw.rect(schermo, colore, (x, y, DIM_QUADRATO, DIM_QUADRATO))    
+                
+            if [riga, colonna] == player_pos:
+                schermo.blit(sprite_player, (x, y))
             elif [riga, colonna] == enemy_pos:
                 colore = BLU
             elif [riga,colonna] == enemy2_pos:
                 colore = VERDE
-            else:
-                colore = BIANCO
-            pygame.draw.rect(schermo, colore, (x, y, DIM_QUADRATO, DIM_QUADRATO))
+            elif [riga,colonna] == enemy3_pos:
+                colore = AZZURRO
             
-def aggiorna_posizione_nemico():
-    start = f"{enemy_pos[0]}/{enemy_pos[1]}"
+                
+            
+            
+def aggiorna_posizione_nemico(enemyStart, enemyEnd):
+    start = f"{enemyStart}/{enemyEnd}"
     goal = f"{player_pos[0]}/{player_pos[1]}"
     query = f"a_star_prima_mossa({start}, {goal}, NextMove)"
     
-    try:
-        result = list(prolog.query(query))
-        print(f"Risultato da Prolog: {result}")  # Mostra il risultato grezzo
-        if result:
-            next_move = result[0]['NextMove']
-            print(f"NextMove restituito da Prolog: {next_move}")  # Stampa il valore di NextMove
-            
-            # Gestione del parsing della stringa restituita
-            if isinstance(next_move, str):
-                next_x, next_y = map(int, next_move.split('/'))
-                enemy_pos[0], enemy_pos[1] = next_x, next_y
-            else:
-                print(f"Formato non previsto per NextMove: {type(next_move)}")
-        else:
-            print("Prolog non ha restituito alcun risultato.")
-    except Exception as e:
-        print(f"Errore durante la chiamata a Prolog: {e}")
-        
+    result = list(prolog.query(query))
+    
+    risultato = estrai_numeri(str(result))
+    [prologX, prologY] = risultato  
+    return [prologX,prologY]
+    
+    
+  
                        
+def estrai_numeri(stringa):
+    numeri = re.findall(r'\d+', stringa)  # Trova tutti i numeri (sequenze di cifre)
+    return [int(n) for n in numeri]
 
 # Loop principale
 running = True
@@ -121,20 +129,32 @@ while running:
     # Gestione del movimento quando i tasti sono premuti
     if keys[pygame.K_UP] and not up_pressed and player_pos[0] > 0 and labirinto[player_pos[0]-1][player_pos[1]] != 1:
         player_pos[0] -= 1
-        aggiorna_posizione_nemico()
         up_pressed = True  # Set flag per evitare il movimento continuo
+        enemy_pos = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1])
+        enemy2_pos = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1])
+        enemy3_pos = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1])
+        
     if keys[pygame.K_DOWN] and not down_pressed and player_pos[0] < RIGHE - 1 and labirinto[player_pos[0]+1][player_pos[1]] != 1:
         player_pos[0] += 1
-        aggiorna_posizione_nemico()
         down_pressed = True  # Set flag per evitare il movimento continuo
+        enemy_pos = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1])
+        enemy2_pos = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1])
+        enemy3_pos = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1])
+        
     if keys[pygame.K_LEFT] and not left_pressed and player_pos[1] > 0 and labirinto[player_pos[0]][player_pos[1]-1] != 1:
         player_pos[1] -= 1
-        aggiorna_posizione_nemico()
         left_pressed = True  # Set flag per evitare il movimento continuo
+        enemy_pos = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1])
+        enemy2_pos = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1])
+        enemy3_pos = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1])
+        
     if keys[pygame.K_RIGHT] and not right_pressed and player_pos[1] < COLONNE - 1 and labirinto[player_pos[0]][player_pos[1]+1] != 1:
         player_pos[1] += 1
-        aggiorna_posizione_nemico()
         right_pressed = True  # Set flag per evitare il movimento continuo
+        enemy_pos = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1])
+        enemy2_pos = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1])
+        enemy3_pos = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1])
+        
 
     # Se il tasto viene rilasciato, resettare il flag
     if not keys[pygame.K_UP]:
@@ -147,9 +167,10 @@ while running:
         right_pressed = False
         
     
+        
     #ENEMY1
         
-
+    
     # Riempie lo schermo con il colore di sfondo
     schermo.fill(NERO)
     #print(player_pos)
@@ -212,3 +233,4 @@ pygame.quit()
     if not keys[pygame.K_h]:
         h_pressed = False   
     """
+    
