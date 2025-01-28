@@ -169,6 +169,7 @@ while running:
         enemy_pos, sprite_enemy1, enemy1Direction = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1], sprite_enemy1, enemy1Direction)
         enemy2_pos, sprite_enemy2, enemy2Direction = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1], sprite_enemy2, enemy2Direction)
         enemy3_pos, sprite_enemy3, enemy3Direction = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1], sprite_enemy3, enemy3Direction)
+        print(enemy_pos, enemy2_pos, enemy3_pos)
         
     if keys[pygame.K_DOWN] and not down_pressed and player_pos[0] < RIGHE - 1 and labirinto[player_pos[0]+1][player_pos[1]] != 1:
         player_pos[0] += 1
@@ -176,7 +177,7 @@ while running:
         enemy_pos, sprite_enemy1, enemy1Direction = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1], sprite_enemy1, enemy1Direction)
         enemy2_pos, sprite_enemy2, enemy2Direction = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1], sprite_enemy2, enemy2Direction)
         enemy3_pos, sprite_enemy3, enemy3Direction = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1], sprite_enemy3, enemy3Direction)
-        
+        print(enemy_pos, enemy2_pos, enemy3_pos)
         
     if keys[pygame.K_LEFT] and not left_pressed and player_pos[1] > 0 and labirinto[player_pos[0]][player_pos[1]-1] != 1:
         player_pos[1] -= 1
@@ -184,7 +185,7 @@ while running:
         enemy_pos, sprite_enemy1, enemy1Direction = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1], sprite_enemy1, enemy1Direction)
         enemy2_pos, sprite_enemy2, enemy2Direction = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1], sprite_enemy2, enemy2Direction)
         enemy3_pos, sprite_enemy3, enemy3Direction = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1], sprite_enemy3, enemy3Direction)
-        
+        print(enemy_pos, enemy2_pos, enemy3_pos)
         #Gira lo sprite seguendo la direzione
         if playerDirection==1:
             sprite_player = pygame.transform.flip(sprite_player, True, False)
@@ -196,7 +197,7 @@ while running:
         enemy_pos, sprite_enemy1, enemy1Direction = aggiorna_posizione_nemico(enemy_pos[0],enemy_pos[1], sprite_enemy1, enemy1Direction)
         enemy2_pos, sprite_enemy2, enemy2Direction = aggiorna_posizione_nemico(enemy2_pos[0],enemy2_pos[1], sprite_enemy2, enemy2Direction)
         enemy3_pos, sprite_enemy3, enemy3Direction = aggiorna_posizione_nemico(enemy3_pos[0],enemy3_pos[1], sprite_enemy3, enemy3Direction)
-        
+        print(enemy_pos, enemy2_pos, enemy3_pos)
         #Gira lo sprite seguendo la direzione
         if playerDirection==0:
             sprite_player = pygame.transform.flip(sprite_player, True, False)
