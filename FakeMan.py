@@ -29,7 +29,8 @@ AZZURRO = (0,255,255)
 
 #Flag
 MONSTER_GENERATION = True
-NUMER_OF_TURN_GENERATION = 7
+NUMBER_OF_TURN_GENERATION = 7
+NUMBER_OF_PALLINI = 5
 
 #booleani per il controllo delle animazioni
 playerDirection = 0 #1 is right || #0 is left
@@ -52,9 +53,14 @@ sprite_enemy2 = pygame.transform.scale(sprite_enemy2, (DIM_QUADRATO, DIM_QUADRAT
 sprite_enemy3 = pygame.image.load("immagini/Rosso.png")
 sprite_enemy3 = pygame.transform.scale(sprite_enemy3, (DIM_QUADRATO, DIM_QUADRATO))
 
+sprite_pallino = pygame.image.load("immagini/pallino.png")
+sprite_pallino = pygame.transform.scale(sprite_pallino, (DIM_QUADRATO, DIM_QUADRATO))
+
 #Gruppo per la selezione random degli sprite
 spriteGroup = [sprite_enemy1, sprite_enemy2, sprite_enemy3]
 posGroup = [[0,1],[0,19],[13,0]]
+validCellGroup = []   #######################
+cellWithPallino = []
 
 
 # Crea la finestra
@@ -99,7 +105,19 @@ with open("labirinto.txt", "r") as file:
           x, y = map(int, riga.strip().split(","))
           labirinto[x][y] = 1
 
-
+def disegna_Pallini():
+    for riga in range(RIGHE):
+        for colonna in range(COLONNE):
+            if labirinto[riga][colonna] == 0:
+                valideCell = [riga,colonna]
+                validCellGroup.append(valideCell)
+    for i in range(NUMBER_OF_PALLINI):
+        cell = random.choice(validCellGroup)
+        if cell not in cellWithPallino:  # Controlla che il pallino non sia già stato aggiunto
+            cellWithPallino.append(cell)
+       
+        
+                
 # Funzione per disegnare la griglia
 def disegna_griglia():
     for riga in range(RIGHE):
@@ -117,11 +135,17 @@ def disegna_griglia():
             if [riga, colonna] == player_pos:
                 schermo.blit(sprite_player, (x, y))
                 
+                
               # Disegna tutti i nemici
             for nemico in nemici:
                 if [riga, colonna] == nemico["pos"]:
                     schermo.blit(nemico["sprite"], (x, y))
-            
+                    
+                    
+            for cella in cellWithPallino:
+                if[riga,colonna] == cella:
+                    schermo.blit(sprite_pallino, (x, y))
+                
               
             
 #Funzione per aggiornare il movimento del nemico
@@ -171,6 +195,7 @@ def estrai_numeri(stringa):
     numeri = re.findall(r'\d+', stringa)  # Trova tutti i numeri (sequenze di cifre)
     return [int(n) for n in numeri]
 
+disegna_Pallini()
 # Loop principale
 running = True
 while running:
@@ -188,21 +213,21 @@ while running:
         player_pos[0] -= 1
         up_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        if MONSTER_GENERATION  and numeroMosse % NUMER_OF_TURN_GENERATION == 0:
+        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_GENERATION == 0:
             aggiungi_nemico()
-             
+            
     if keys[pygame.K_DOWN] and not down_pressed and player_pos[0] < RIGHE - 1 and labirinto[player_pos[0]+1][player_pos[1]] != 1:
         player_pos[0] += 1
         down_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        if MONSTER_GENERATION  and numeroMosse % NUMER_OF_TURN_GENERATION == 0:
+        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_GENERATION == 0:
             aggiungi_nemico()
             
     if keys[pygame.K_LEFT] and not left_pressed and player_pos[1] > 0 and labirinto[player_pos[0]][player_pos[1]-1] != 1:
         player_pos[1] -= 1
         left_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        if MONSTER_GENERATION  and numeroMosse % NUMER_OF_TURN_GENERATION == 0:
+        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_GENERATION == 0:
             aggiungi_nemico()
         #Gira lo sprite seguendo la direzione
         if playerDirection==1:
@@ -213,7 +238,7 @@ while running:
         player_pos[1] += 1
         right_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        if MONSTER_GENERATION  and numeroMosse % NUMER_OF_TURN_GENERATION == 0:
+        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_GENERATION == 0:
             aggiungi_nemico()
             
         #Gira lo sprite seguendo la direzione
@@ -242,7 +267,7 @@ while running:
     #print(enemy_pos)
     # Disegna la griglia
     disegna_griglia()
-
+    
     # Aggiorna il display
     pygame.display.flip()
 
