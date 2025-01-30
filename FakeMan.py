@@ -29,13 +29,14 @@ AZZURRO = (0,255,255)
 
 #Flag
 MONSTER_GENERATION = True
+MAX_MONSTER_NUMBER = 5
 NUMBER_OF_TURN_GENERATION = 7
 NUMBER_OF_PALLINI = 5
 
 #booleani per il controllo delle animazioni
 playerDirection = 0 #1 is right || #0 is left
 numeroMosse = 0 #contatore mosse
-
+pallinePrese = 0
 
 #Sprite player
 sprite_player = pygame.image.load("immagini/FakeMan.png")
@@ -120,6 +121,7 @@ def disegna_Pallini():
                 
 # Funzione per disegnare la griglia
 def disegna_griglia():
+    global pallinePrese
     for riga in range(RIGHE):
         for colonna in range(COLONNE):
             x = colonna * (DIM_QUADRATO + OFFSET)
@@ -145,8 +147,10 @@ def disegna_griglia():
             for cella in cellWithPallino:
                 if[riga,colonna] == cella:
                     schermo.blit(sprite_pallino, (x, y))
-                
-              
+                    if cella == player_pos:
+                        cellWithPallino.remove(cella)
+                        pallinePrese = pallinePrese + 1
+                        print(pallinePrese)
             
 #Funzione per aggiornare il movimento del nemico
 def aggiorna_posizione_nemico(numMosse):
@@ -182,13 +186,14 @@ def aggiorna_posizione_nemico(numMosse):
 
 def aggiungi_nemico():
     global nemici
-    nuovo_nemico = {
-        "pos" : random.choice(posGroup),
-        "sprite" : random.choice(spriteGroup),
-        "direction" : 0
-        
-    }
-    nemici.append(nuovo_nemico)
+    if len(nemici)<= MAX_MONSTER_NUMBER:
+        nuovo_nemico = {
+            "pos" : random.choice(posGroup),
+            "sprite" : random.choice(spriteGroup),
+            "direction" : 0
+            
+        }
+        nemici.append(nuovo_nemico)
   
 #Funzione per estrarre numeri dalla stringa
 def estrai_numeri(stringa):
