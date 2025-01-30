@@ -38,7 +38,7 @@ camper_Payoff(P1Pos,P2Pos,BallList,Val):-
     distanza_nemico_pallino(P2Pos, P1Pos, BallList, D2),
     Val is D1 + (1 - D2).
 
-campers_Payoff(P1Pos,[H],BallList,Val) :- camper_Payoff(P1Pos, H, BallList, Val).
+campers_Payoff(_,[],_,0).
 
 campers_Payoff(P1Pos,[H|T],BallList,Val):-
     campers_Payoff(P1Pos,T, BallList,Val1),
@@ -46,3 +46,19 @@ campers_Payoff(P1Pos,[H|T],BallList,Val):-
     Val is Val1 + Val2.
 
 
+passable_tiles(_, [],List,N) :- length(List,N).
+passable_tiles(Enemies,[H|T],List,N):-
+    findall(Pos, (adiacent(H, Pos), \+member(Pos, Enemies), \+member(Pos, List), \+member(Pos, T)), List1),
+    List2 = [H|List],
+    append(T, List1, List3),
+    passable_tiles(Enemies,List3, List2,N).
+
+
+total_tiles(N, EnemyCount) :- findall(Pos, pInv(Pos), List), length(List, N1), N is N1 - EnemyCount.
+
+
+passable_tiles_payoff(Enemies, PlayerPos, Val) :-
+    length(Enemies, L),
+    passable_tiles(Enemies, [PlayerPos], [], PassT),
+    total_tiles(TotalT, L),
+    Val is 1 - (PassT / TotalT).

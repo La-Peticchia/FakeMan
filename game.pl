@@ -71,16 +71,8 @@ create_objects(Window) :-
     send(Player1, fill_pattern, colour(blue)),
     PX is X*20+2.5, PY is Y*20+2.5,
     send(Window, display,Player1, point(PX,PY)),
-/*
-    Player2 = @p2, X1/Y1 = 19/14,
-    assert(playerPos(Player2, X1/Y1)),
-    new(Player2, box(15,15)),
-    send(Player2, fill_pattern, colour(red)),
-    PX1 is X1*20+2.5, PY1 is Y1*20+2.5,
-    send(Window, display,Player2, point(PX1,PY1)),
-*/
 
-    spawnEnemies(Window, [19/14, 18/7]),
+    spawnEnemies(Window, [19/14, 18/7, 0/13]),
 
     spawnBalls(Window, 3).
 

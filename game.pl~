@@ -44,7 +44,7 @@ play(Window, [@p2, P1Pos, P2Pos, play, BallList]):-
     writeln("p2 turn"),
     bestMove([@p2, P1Pos, P2Pos, play, BallList], [_, _, NewP2Pos, _, _]),
     findall(Add, (playerPos(Add, _) , Add \= @p1), Enemies),
-    moveEnemies(Window, Enemies, P2Pos),
+    moveEnemies(Window, Enemies, NewP2Pos),
     (
         check_list_adiacent1(NewP2Pos, P1Pos) -> writeln("You Lose"), true;
         play(Window,[@p1, P1Pos, NewP2Pos, play, BallList])
@@ -80,7 +80,7 @@ create_objects(Window) :-
     send(Window, display,Player2, point(PX1,PY1)),
 */
 
-    spawnEnemies(Window, [19/14, 18/7]),
+    spawnEnemies(Window, [19/14, 18/7, 0/13]),
 
     spawnBalls(Window, 3).
 
