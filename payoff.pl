@@ -1,0 +1,48 @@
+% This buffer is for notes you don't want to save.
+% If you want to create a file, visit that file with C-x C-f,
+% then enter the text in that file's own buffer.
+
+
+
+% Distanza Manhattan tra due punti
+distanza_manhattan_norm(X1/Y1, X2/Y2, D) :-
+    D is (abs(X1 - X2) + abs(Y1 - Y2)) / 33.
+
+distanza_manhattan(X1/Y1, X2/Y2, D) :-
+    D is abs(X1 - X2) + abs(Y1 - Y2).
+
+
+% Funzione di utilità: distanza tra il giocatore e il pallino più vicino
+distanza_giocatore_pallino(Giocatore, Pallini, PallinoPiuVicino, DistanzaMinima) :-
+    findall((Distanza, Pallino), (member(Pallino, Pallini), distanza_manhattan_norm(Giocatore, Pallino, Distanza)), Coppie),%creo una lista di coppie che mi permette di conservare il riferimento al pallino che corrisponde alla distanza minima.
+    sort(Coppie, [(DistanzaMinima, PallinoPiuVicino)|_]).%ordino la lista in base alla distanza e prendo il il primo elemento che rappresenta il pallino piu vicino
+
+% Funzione di utilità: distanza tra il nemico e il pallino più vicino al giocatore
+distanza_nemico_pallino(Nemico, Giocatore, Pallini, DistanzaNemicoPallino) :-
+    distanza_giocatore_pallino(Giocatore, Pallini, PallinoPiuVicino, _),
+    distanza_manhattan_norm(Nemico, PallinoPiuVicino, DistanzaNemicoPallino).%calcolo la distanza tra il pallino piu vicino e il nemico
+
+
+sort_list_by_distance(Pos1, List, OutList):-
+    findall((Dist, Pos), (member(Pos,List), distanza_manhattan_norm(Pos1, Pos, Dist)), List1),
+    sort(List1,List2),
+    findall(Pos2, member((_,Pos2), List2), OutList).
+
+
+follower_Payoff(P1Pos,P2Pos, Val):-
+ distanza_manhattan_norm(P1Pos,P2Pos,D),
+ Val is 1 - D.
+
+camper_Payoff(P1Pos,P2Pos,BallList,Val):-
+    distanza_giocatore_pallino(P1Pos, BallList, _, D1),
+    distanza_nemico_pallino(P2Pos, P1Pos, BallList, D2),
+    Val is D1 + (1 - D2).
+
+campers_Payoff(P1Pos,[H],BallList,Val) :- camper_Payoff(P1Pos, H, BallList, Val).
+
+campers_Payoff(P1Pos,[H|T],BallList,Val):-
+    campers_Payoff(P1Pos,T, BallList,Val1),
+    camper_Payoff(P1Pos,H, BallList, Val2),
+    Val is Val1 + Val2.
+
+

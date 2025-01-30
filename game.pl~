@@ -13,7 +13,7 @@ play :-
     disegna_pianta(Window, "Test"),
     create_objects(Window),
     playerPos(@p1,P1Pos),
-    playerPos(@p2,P2Pos),
+    findall(X/Y, (playerPos(Add, X/Y) , Add \= @p1), P2Pos),
     findall(X/Y, ballPos(_,X/Y), List),
     play(Window,[@p1, P1Pos, P2Pos, play, List]).
 
@@ -43,15 +43,21 @@ play(Window, [@p1, P1Pos, P2Pos, play, BallList]):-
 play(Window, [@p2, P1Pos, P2Pos, play, BallList]):-
     writeln("p2 turn"),
     bestMove([@p2, P1Pos, P2Pos, play, BallList], [_, _, NewP2Pos, _, _]),
-    movePlayer(Window, @p2, NewP2Pos),
+    findall(Add, (playerPos(Add, _) , Add \= @p1), Enemies),
+    moveEnemies(Window, Enemies, P2Pos),
     (
-        adiacent(P1Pos, NewP2Pos) -> writeln("You Lose"), true;
+        check_list_adiacent1(NewP2Pos, P1Pos) -> writeln("You Lose"), true;
         play(Window,[@p1, P1Pos, NewP2Pos, play, BallList])
     ).
 
-bestMove(CurrentPos, NextPos):-
-    alfabeta(CurrentPos, -100, 100,3, NextPos, _).
+bestMove([Round, P1Pos, P2Pos, State, BallList], [NextRound, NextP1Pos, NextP2Pos, NextState, NextBallList]):-
+    alfabeta([Round, 0, P1Pos, P2Pos, State, BallList], -100, 100,6, [NextRound,_, NextP1Pos, NextP2Pos, NextState, NextBallList], _).
 
+
+moveEnemies(_, [], []).
+moveEnemies(Window, [H|T], [H1|T1]):-
+    movePlayer(Window, H, H1),
+    moveEnemies(Window,T, T1).
 
 movePlayer(Window, Player, X/Y):-
     PX is X*20+2.5, PY is Y*20+2.5,
@@ -65,38 +71,19 @@ create_objects(Window) :-
     send(Player1, fill_pattern, colour(blue)),
     PX is X*20+2.5, PY is Y*20+2.5,
     send(Window, display,Player1, point(PX,PY)),
-
-    Player2 = @p2, X1/Y1 = 14/19,
+/*
+    Player2 = @p2, X1/Y1 = 19/14,
     assert(playerPos(Player2, X1/Y1)),
     new(Player2, box(15,15)),
     send(Player2, fill_pattern, colour(red)),
     PX1 is X1*20+2.5, PY1 is Y1*20+2.5,
     send(Window, display,Player2, point(PX1,PY1)),
+*/
+
+    spawnEnemies(Window, [19/14, 18/7]),
 
     spawnBalls(Window, 3).
 
-/*
-    Ball1 = @b1,
-    new(Ball1, circle(10)),
-    send(Ball1, fill_pattern, colour(orange)),
-    ballPos(Ball1, X2/Y2),
-    PX2 is X2*20+5, PY2 is Y2*20+5,
-    send(Window, display,Ball1, point(PX2,PY2)),
-
-    Ball2 = @b2,
-    new(Ball2, circle(10)),
-    send(Ball2, fill_pattern, colour(orange)),
-    ballPos(Ball2, X3/Y3),
-    PX3 is X3*20+5, PY3 is Y3*20+5,
-    send(Window, display,Ball2, point(PX3,PY3)),
-
-    Ball3 = @b3,
-    new(Ball3, circle(10)),
-    send(Ball3, fill_pattern, colour(orange)),
-    ballPos(Ball3, X4/Y4),
-    PX4 is X4*20+5, PY4 is Y4*20+5,
-    send(Window, display,Ball3, point(PX4,PY4)).
-*/
 
 spawnBalls(_,0).
 spawnBalls(Window, Count):-
@@ -109,6 +96,15 @@ spawnBalls(Window, Count):-
 
     NewCount is Count - 1,
     spawnBalls(Window, NewCount).
+
+spawnEnemies(_, []).
+spawnEnemies(Window, [X/Y|T]):-
+    new(Enemy, box(15,15)),
+    assert(playerPos(Enemy, X/Y)),
+    send(Enemy, fill_pattern, colour(red)),
+    PX is X*20+2.5, PY is Y*20+2.5,
+    send(Window, display, Enemy, point(PX,PY)),
+    spawnEnemies(Window, T).
 
 free_objects(Window) :-
     free(Window),

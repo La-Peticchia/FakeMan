@@ -21,8 +21,8 @@ ruoli_nemici(Nemico1, Nemico2, Giocatore, Inseguitore, Anticipatore) :-
     distanza_manhattan_norm(Nemico1, Giocatore, Distanza1),
     distanza_manhattan_norm(Nemico2, Giocatore, Distanza2),
     ( Distanza1 =< Distanza2 ->
-        Inseguitore = Nemico1,
-        Anticipatore = Nemico2
+        Inseguitore = Nemico1, %inseguitore e' il nemico piu vicino al giocatore
+        Anticipatore = Nemico2 %anticipatore e' il nemico piu lontano dal giocatore
     ;
         Inseguitore = Nemico2,
         Anticipatore = Nemico1
@@ -41,15 +41,15 @@ predire_mossa_giocatore(Giocatore, PallinoPiuVicino, NuovaPosizione) :-
 
 % Utilità collaborativa: i nemici collaborano per ridurre le opzioni di fuga del giocatore
 collaborazione_nemici(Nemico1, Nemico2, Giocatore, Pallini, MossaMigliore) :-
-    % Determinare i ruoli
+    % Inizio determinando i ruoli
     ruoli_nemici(Nemico1, Nemico2, Giocatore, Inseguitore, Anticipatore),
-    % Predire la prossima posizione del giocatore verso il pallino più vicino
+    % Predico la prossima posizione del giocatore verso il pallino più vicino
     distanza_giocatore_pallino(Giocatore, Pallini, PallinoPiuVicino, _),
     predire_mossa_giocatore(Giocatore, PallinoPiuVicino, PosizionePredetta),
-    % Calcolare la distanza di ciascun nemico verso la posizione predetta
+    % Calcolo la distanza di ciascun nemico verso la posizione predetta
     distanza_manhattan_norm(Inseguitore, PosizionePredetta, DistanzaInseguitore),
     distanza_manhattan_norm(Anticipatore, PosizionePredetta, DistanzaAnticipatore),
-    % Scegliere la mossa migliore per entrambi
+    % Infine scelgo la mossa migliore per entrambi
     ( DistanzaInseguitore =< DistanzaAnticipatore ->
         MossaMigliore = insegui(PosizionePredetta)
     ;
