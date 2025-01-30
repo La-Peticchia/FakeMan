@@ -28,15 +28,16 @@ GIALLO = (255,255,0)
 AZZURRO = (0,255,255)
 
 #Flag
-MONSTER_GENERATION = True
+MONSTER_GENERATION = False
 MAX_MONSTER_NUMBER = 5
-NUMBER_OF_TURN_GENERATION = 7
-NUMBER_OF_PALLINI = 5
+NUMBER_OF_TURN_INFRA_GENERATION = 7
+NUMBER_OF_PALLINI = 1
 
 #booleani per il controllo delle animazioni
 playerDirection = 0 #1 is right || #0 is left
 numeroMosse = 0 #contatore mosse
 pallinePrese = 0
+stopCondition = False
 
 #Sprite player
 sprite_player = pygame.image.load("immagini/FakeMan.png")
@@ -56,6 +57,12 @@ sprite_enemy3 = pygame.transform.scale(sprite_enemy3, (DIM_QUADRATO, DIM_QUADRAT
 
 sprite_pallino = pygame.image.load("immagini/pallino.png")
 sprite_pallino = pygame.transform.scale(sprite_pallino, (DIM_QUADRATO, DIM_QUADRATO))
+
+sprite_win = pygame.image.load("immagini/YouWin.png")
+sprite_win = pygame.transform.scale(sprite_win,(ALTEZZA_FINESTRA//2, LARGHEZZA_FINESTRA//2))
+
+sprite_lose = pygame.image.load("immagini/GameOver.png")
+sprite_lose = pygame.transform.scale(sprite_lose,(ALTEZZA_FINESTRA, LARGHEZZA_FINESTRA))
 
 #Gruppo per la selezione random degli sprite
 spriteGroup = [sprite_enemy1, sprite_enemy2, sprite_enemy3]
@@ -122,6 +129,7 @@ def disegna_Pallini():
 # Funzione per disegnare la griglia
 def disegna_griglia():
     global pallinePrese
+    global stopCondition
     for riga in range(RIGHE):
         for colonna in range(COLONNE):
             x = colonna * (DIM_QUADRATO + OFFSET)
@@ -144,13 +152,30 @@ def disegna_griglia():
                     schermo.blit(nemico["sprite"], (x, y))
                     
                     
+                    
             for cella in cellWithPallino:
                 if[riga,colonna] == cella:
                     schermo.blit(sprite_pallino, (x, y))
                     if cella == player_pos:
                         cellWithPallino.remove(cella)
                         pallinePrese = pallinePrese + 1
-                        print(pallinePrese)
+                        
+                        
+    if pallinePrese == NUMBER_OF_PALLINI:
+        stopCondition = True
+        x = (LARGHEZZA_FINESTRA - sprite_win.get_width()) // 2
+        y = (ALTEZZA_FINESTRA - sprite_win.get_height()) // 2
+        schermo.blit(sprite_win, (x, y))
+    
+    for nemico in nemici:
+        if nemico["pos"] == player_pos:
+            stopCondition = True
+            x = (LARGHEZZA_FINESTRA - sprite_lose.get_width()) // 2
+            y = (ALTEZZA_FINESTRA - sprite_lose.get_height()) // 2
+            schermo.blit(sprite_lose, (x, y))
+             
+        
+                            
             
 #Funzione per aggiornare il movimento del nemico
 def aggiorna_posizione_nemico(numMosse):
@@ -203,6 +228,7 @@ def estrai_numeri(stringa):
 disegna_Pallini()
 # Loop principale
 running = True
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -214,36 +240,36 @@ while running:
     #PLAYER1
 
     # Gestione del movimento quando i tasti sono premuti
-    if keys[pygame.K_UP] and not up_pressed and player_pos[0] > 0 and labirinto[player_pos[0]-1][player_pos[1]] != 1:
+    if keys[pygame.K_UP] and not up_pressed and player_pos[0] > 0 and labirinto[player_pos[0]-1][player_pos[1]] != 1 and stopCondition==False:
         player_pos[0] -= 1
         up_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_GENERATION == 0:
+        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0:
             aggiungi_nemico()
             
-    if keys[pygame.K_DOWN] and not down_pressed and player_pos[0] < RIGHE - 1 and labirinto[player_pos[0]+1][player_pos[1]] != 1:
+    if keys[pygame.K_DOWN] and not down_pressed and player_pos[0] < RIGHE - 1 and labirinto[player_pos[0]+1][player_pos[1]] != 1 and stopCondition==False:
         player_pos[0] += 1
         down_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_GENERATION == 0:
+        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0:
             aggiungi_nemico()
             
-    if keys[pygame.K_LEFT] and not left_pressed and player_pos[1] > 0 and labirinto[player_pos[0]][player_pos[1]-1] != 1:
+    if keys[pygame.K_LEFT] and not left_pressed and player_pos[1] > 0 and labirinto[player_pos[0]][player_pos[1]-1] != 1 and stopCondition==False:
         player_pos[1] -= 1
         left_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_GENERATION == 0:
+        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0:
             aggiungi_nemico()
         #Gira lo sprite seguendo la direzione
         if playerDirection==1:
             sprite_player = pygame.transform.flip(sprite_player, True, False)
             playerDirection = 0
         
-    if keys[pygame.K_RIGHT] and not right_pressed and player_pos[1] < COLONNE - 1 and labirinto[player_pos[0]][player_pos[1]+1] != 1:
+    if keys[pygame.K_RIGHT] and not right_pressed and player_pos[1] < COLONNE - 1 and labirinto[player_pos[0]][player_pos[1]+1] != 1 and stopCondition==False:
         player_pos[1] += 1
         right_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_GENERATION == 0:
+        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0:
             aggiungi_nemico()
             
         #Gira lo sprite seguendo la direzione
