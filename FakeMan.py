@@ -32,6 +32,7 @@ MONSTER_GENERATION = False
 MAX_MONSTER_NUMBER = 5
 NUMBER_OF_TURN_INFRA_GENERATION = 7
 NUMBER_OF_PALLINI = 1
+IMMORTALITY = True
 
 #booleani per il controllo delle animazioni
 playerDirection = 0 #1 is right || #0 is left
@@ -169,10 +170,11 @@ def disegna_griglia():
     
     for nemico in nemici:
         if nemico["pos"] == player_pos:
-            stopCondition = True
-            x = (LARGHEZZA_FINESTRA - sprite_lose.get_width()) // 2
-            y = (ALTEZZA_FINESTRA - sprite_lose.get_height()) // 2
-            schermo.blit(sprite_lose, (x, y))
+            if IMMORTALITY == False:
+                stopCondition = True
+                x = (LARGHEZZA_FINESTRA - sprite_lose.get_width()) // 2
+                y = (ALTEZZA_FINESTRA - sprite_lose.get_height()) // 2
+                schermo.blit(sprite_lose, (x, y))
              
         
                             
