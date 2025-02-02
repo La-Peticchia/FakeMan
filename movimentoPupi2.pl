@@ -1,5 +1,6 @@
 %:-use_module(library(pce)).
 :-[mappaprolog].
+:- use_module(library(random)).
 
 % Disegna la mappa in base ai predicati p/1 (celle valide)
 disegna_pianta(Finestra, Nome, PlayerPosX/PlayerPosY, EnemyPosX/EnemyPosY) :-
@@ -74,3 +75,39 @@ adiacente(X/Y, X1/Y, 1) :- X1 is X + 1, p(X1/Y).
 adiacente(X/Y, X/Y1, 1) :- Y1 is Y + 1, p(X/Y1).
 adiacente(X/Y, X1/Y, 1) :- X1 is X - 1, p(X1/Y).
 adiacente(X/Y, X/Y1, 1) :- Y1 is Y - 1, p(X/Y1).
+
+
+% Movimento casuale del nemico
+nemico_vaga(PosizioneCorrente, NuovaPosizione) :-
+    findall(Adiacente, adiacente(PosizioneCorrente, Adiacente, 1), MossePossibili),
+    random_member(NuovaPosizione, MossePossibili).
+
+% Verifica se il nemico vede il giocatore sulla stessa riga o colonna (senza ostacoli)
+vede_giocatore(NemicoPos, GiocatorePos) :-
+    NemicoPos = X/Y,
+    GiocatorePos = X/YG,  % stessa colonna
+    percorso_libero_verticale(Y, YG, X).
+
+vede_giocatore(NemicoPos, GiocatorePos) :-
+    NemicoPos = X/Y,
+    GiocatorePos = XG/Y,  % stessa riga
+    percorso_libero_orizzontale(X, XG, Y).
+
+% Percorso libero verticalmente
+percorso_libero_verticale(Y1, Y2, X) :-
+    MinY is min(Y1, Y2),
+    MaxY is max(Y1, Y2),
+    forall(between(MinY, MaxY, Y), p(X/Y)).
+
+% Percorso libero orizzontalmente
+percorso_libero_orizzontale(X1, X2, Y) :-
+    MinX is min(X1, X2),
+    MaxX is max(X1, X2),
+    forall(between(MinX, MaxX, X), p(X/Y)).
+
+% Comportamento del nemico: vaga o insegue il giocatore
+muovi_nemico(NemicoPos, GiocatorePos, NuovaPosizione) :-
+    (   vede_giocatore(NemicoPos, GiocatorePos) -> % se il nemico vede il giocatore allora lo insegue con A* senno continua a vagare
+        a_star_prima_mossa(NemicoPos, GiocatorePos, NuovaPosizione)
+    ;   nemico_vaga(NemicoPos, NuovaPosizione)
+    ).
