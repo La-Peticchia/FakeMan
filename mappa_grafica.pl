@@ -1,5 +1,4 @@
 
-:-[mappa].
 
 disegna_pianta(Finestra, Nome) :-
     new(Finestra, picture(Nome)),

@@ -1,7 +1,8 @@
-%:-use_module(library(pce)).
-:-[mappaprolog].
+:-use_module(library(pce)).
+%:-[mappaprolog].
 
 % Disegna la mappa in base ai predicati p/1 (celle valide)
+/*
 disegna_pianta(Finestra, Nome, PlayerPosX/PlayerPosY, EnemyPosX/EnemyPosY) :-
     new(Finestra, picture(Nome)),
     send(Finestra, size, size(400, 300)),
@@ -39,6 +40,7 @@ disegna_pianta(Finestra, Nome, PlayerPosX/PlayerPosY, EnemyPosX/EnemyPosY) :-
     new(Verde, box(20, 20)),
     send(Verde, fill_pattern, colour(green)),
     send(Finestra, display, Verde, point(GY_Enemy, GX_Enemy)).
+*/
 
 % Euristica: distanza Manhattan
 heuristic(X1/Y1, X2/Y2, H) :-
@@ -46,12 +48,21 @@ heuristic(X1/Y1, X2/Y2, H) :-
 
 % Trova la prima mossa valida con A*
 a_star_prima_mossa(Start, Goal, NextMove) :-
-    a_star_search_prima_mossa([node(Start, 0, 0, [])], [], Goal, NextMove).
+    a_star_search_prima_mossa([node(Start, 0, 0, [])], [], Goal, _, [NextMove|_]).
+
+a_star_costo(Start, Goal, C) :-
+    a_star_search_prima_mossa([node(Start, 0, 0, [])], [], Goal, C, _).
+
+a_star_percorso(Start, Goal, Path):-
+    a_star_search_prima_mossa([node(Start, 0, 0, [])], [], Goal,_, Path).
+
+
 
 % Modifica l'algoritmo A* per fermarsi al primo passo
-a_star_search_prima_mossa([node(Pos, _, _, Path)|_], _, Pos, NextMove) :-
-    reverse([Pos|Path], [_, NextMove|_]). % Ritorna solo il primo passo dopo la posizione iniziale
-a_star_search_prima_mossa([node(Pos, G, _, Path)|Open], Closed, Goal, NextMove) :-
+a_star_search_prima_mossa([node(Pos, C, _, Path)|_], _, Pos, C, TotPath) :-
+    reverse([Pos|Path], [_|TotPath]).
+
+a_star_search_prima_mossa([node(Pos, G, _, Path)|Open], Closed, Goal, C, TotPath) :-
     findall(
         node(Next, GNew, F, [Pos|Path]),
         (   adiacente(Pos, Next, 1),        % Trova i vicini
@@ -65,8 +76,7 @@ a_star_search_prima_mossa([node(Pos, G, _, Path)|Open], Closed, Goal, NextMove) 
     ),
     append(Open, Neighbors, NewOpen),
     sort(2, @=<, NewOpen, SortedOpen), % Ordina per F (minore è meglio)
-    a_star_search_prima_mossa(SortedOpen, [node(Pos, G, _, Path)|Closed], Goal, NextMove).
-
+    a_star_search_prima_mossa(SortedOpen, [node(Pos, G, _, Path)|Closed], Goal, C, TotPath).
 
 
 % Adiacenze
