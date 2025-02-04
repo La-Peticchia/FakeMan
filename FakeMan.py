@@ -6,7 +6,7 @@ import random
 
 # Inizializza Pygame
 pygame.init()
-
+pygame.mixer.init()
  
  # Costanti
 DIM_QUADRATO = 30         # Dimensione di un quadrato
@@ -31,14 +31,18 @@ AZZURRO = (0,255,255)
 MONSTER_GENERATION = True
 MAX_MONSTER_NUMBER = 3
 NUMBER_OF_TURN_INFRA_GENERATION = 5
-NUMBER_OF_PALLINI = 3
+NUMBER_OF_PALLINI = 2
 IMMORTALITY = False
+SOUND_ON = True
+MUSIC_ON = True
 
 #booleani per il controllo delle animazioni
 playerDirection = 0 #1 is right || #0 is left
 numeroMosse = 0 #contatore mosse
 pallinePrese = 0
 stopCondition = False
+winPlayed = False
+gameOverPlayer = False
 
 #Sprite player
 sprite_player = pygame.image.load("immagini/FakeMan.png")
@@ -71,6 +75,15 @@ posGroup = [[0,1],[0,19],[13,0]]
 validCellGroup = []   #######################
 cellWithPallino = []
 
+#Caricamento Suoni
+Coin_Sound = pygame.mixer.Sound("Sounds/Coin.mp3")
+Win_sound = pygame.mixer.Sound("Sounds/Win.mp3")
+GameOver_Sound = pygame.mixer.Sound("Sounds/GameOver.mp3")
+Move_Sound = pygame.mixer.Sound("Sounds/Move.mp3")
+
+#Caricamento Canzoni
+GameSounds = [pygame.mixer.Sound(f"Sounds/MusicGame{i}.mp3") for i in range(1, 10)]
+print(GameSounds)
 
 # Crea la finestra
 schermo = pygame.display.set_mode((LARGHEZZA_FINESTRA, ALTEZZA_FINESTRA))
@@ -131,6 +144,8 @@ def disegna_Pallini():
 def disegna_griglia():
     global pallinePrese
     global stopCondition
+    global winPlayed
+    global gameOverPlayer
     for riga in range(RIGHE):
         for colonna in range(COLONNE):
             x = colonna * (DIM_QUADRATO + OFFSET)
@@ -160,6 +175,8 @@ def disegna_griglia():
                     if cella == player_pos:
                         cellWithPallino.remove(cella)
                         pallinePrese = pallinePrese + 1
+                        if SOUND_ON and pallinePrese < NUMBER_OF_PALLINI:    
+                            Coin_Sound.play()
                         
                         
     if pallinePrese == NUMBER_OF_PALLINI:
@@ -167,6 +184,11 @@ def disegna_griglia():
         x = (LARGHEZZA_FINESTRA - sprite_win.get_width()) // 2
         y = (ALTEZZA_FINESTRA - sprite_win.get_height()) // 2
         schermo.blit(sprite_win, (x, y))
+        if winPlayed == False and SOUND_ON:
+            Win_sound.play()
+            winPlayed = True
+        
+        
     
     
     else:
@@ -177,7 +199,9 @@ def disegna_griglia():
                     x = (LARGHEZZA_FINESTRA - sprite_lose.get_width()) // 2
                     y = (ALTEZZA_FINESTRA - sprite_lose.get_height()) // 2
                     schermo.blit(sprite_lose, (x, y))
-                    
+                    if gameOverPlayer == False and SOUND_ON:
+                        GameOver_Sound.play()
+                        gameOverPlayer = True
         
                             
             
@@ -230,6 +254,13 @@ def estrai_numeri(stringa):
     numeri = re.findall(r'\d+', stringa)  # Trova tutti i numeri (sequenze di cifre)
     return [int(n) for n in numeri]
 
+def musica_casuale():
+    global GameSounds
+    music = random.choice(GameSounds)
+    music.set_volume(0.5)
+    music.play()
+
+musica_casuale()
 disegna_Pallini()
 # Loop principale
 running = True
@@ -251,14 +282,18 @@ while running:
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
         if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
             aggiungi_nemico()
-        print(len(nemici))   
+        if SOUND_ON:
+            Move_Sound.play() 
+        
     if keys[pygame.K_DOWN] and not down_pressed and player_pos[0] < RIGHE - 1 and labirinto[player_pos[0]+1][player_pos[1]] != 1 and stopCondition==False:
         player_pos[0] += 1
         down_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
         if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
             aggiungi_nemico()
-        print(len(nemici))    
+        if SOUND_ON:
+            Move_Sound.play()     
+        
     if keys[pygame.K_LEFT] and not left_pressed and player_pos[1] > 0 and labirinto[player_pos[0]][player_pos[1]-1] != 1 and stopCondition==False:
         player_pos[1] -= 1
         left_pressed = True  # Set flag per evitare il movimento continuo
@@ -269,14 +304,18 @@ while running:
         if playerDirection==1:
             sprite_player = pygame.transform.flip(sprite_player, True, False)
             playerDirection = 0
-        print(len(nemici))
+        if SOUND_ON:
+            Move_Sound.play() 
+        
     if keys[pygame.K_RIGHT] and not right_pressed and player_pos[1] < COLONNE - 1 and labirinto[player_pos[0]][player_pos[1]+1] != 1 and stopCondition==False:
         player_pos[1] += 1
         right_pressed = True  # Set flag per evitare il movimento continuo
         numeroMosse = aggiorna_posizione_nemico(numeroMosse)
         if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
             aggiungi_nemico()
-        print(len(nemici))    
+        if SOUND_ON:
+            Move_Sound.play()
+          
         #Gira lo sprite seguendo la direzione
         if playerDirection==0:
             sprite_player = pygame.transform.flip(sprite_player, True, False)
@@ -309,56 +348,3 @@ while running:
 
 # Chiudi Pygame
 pygame.quit()
-
-
-
-""" 
-    if keys[pygame.K_w] and not w_pressed and enemy_pos[0] > 0 and labirinto[enemy_pos[0]-1][enemy_pos[1]] != 1: 
-        enemy_pos[0] -= 1
-        w_pressed = True  # Set flag per evitare il movimento continuo
-    if keys[pygame.K_s] and not s_pressed and enemy_pos[0] < RIGHE - 1 and labirinto[enemy_pos[0]+1][enemy_pos[1]] != 1:
-        enemy_pos[0] += 1
-        s_pressed = True  # Set flag per evitare il movimento continuo
-    if keys[pygame.K_a] and not a_pressed and enemy_pos[1] > 0 and labirinto[enemy_pos[0]][enemy_pos[1]-1] != 1:
-        enemy_pos[1] -= 1
-        a_pressed = True  # Set flag per evitare il movimento continuo
-    if keys[pygame.K_d] and not d_pressed and enemy_pos[1] < COLONNE - 1 and labirinto[enemy_pos[0]][enemy_pos[1]+1] != 1:
-        enemy_pos[1] += 1
-        d_pressed = True  # Set flag per evitare il movimento continuo
-
-    # Se il tasto viene rilasciato, resettare il flag
-    if not keys[pygame.K_w]:
-        w_pressed = False
-    if not keys[pygame.K_s]:
-        s_pressed = False
-    if not keys[pygame.K_a]:
-        a_pressed = False
-    if not keys[pygame.K_d]:
-        d_pressed = False   
-        
-    #ENEMY2
-    
-    if keys[pygame.K_t] and not t_pressed and enemy2_pos[0] > 0 and labirinto[enemy2_pos[0]-1][enemy2_pos[1]] != 1: 
-        enemy2_pos[0] -= 1
-        t_pressed = True  # Set flag per evitare il movimento continuo
-    if keys[pygame.K_g] and not g_pressed and enemy2_pos[0] < RIGHE - 1 and labirinto[enemy2_pos[0]+1][enemy2_pos[1]] != 1:
-        enemy2_pos[0] += 1
-        g_pressed = True  # Set flag per evitare il movimento continuo
-    if keys[pygame.K_f] and not f_pressed and enemy2_pos[1] > 0 and labirinto[enemy2_pos[0]][enemy2_pos[1]-1] != 1:
-        enemy2_pos[1] -= 1
-        f_pressed = True  # Set flag per evitare il movimento continuo
-    if keys[pygame.K_h] and not h_pressed and enemy2_pos[1] < COLONNE - 1 and labirinto[enemy2_pos[0]][enemy2_pos[1]+1] != 1:
-        enemy2_pos[1] += 1
-        h_pressed = True  # Set flag per evitare il movimento continuo
-
-    # Se il tasto viene rilasciato, resettare il flag
-    if not keys[pygame.K_t]:
-        t_pressed = False
-    if not keys[pygame.K_g]:
-        g_pressed = False
-    if not keys[pygame.K_f]:
-        f_pressed = False
-    if not keys[pygame.K_h]:
-        h_pressed = False   
-    """
-    
