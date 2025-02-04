@@ -28,15 +28,30 @@ get_target_path(CamperPos, NewTarget, Path):-
 
 get_random_adiacent_pos(Pos, [RandomPos]):-
     findall(Pos1, adiacente(Pos,Pos1,_), List),
-    length(List, L),
-    random(0,L,Index),
-    elementAtIndex(Index, List, RandomPos).
+    random_member(RandomPos, List).
 
 seek(_,Pos, Pos).
 
 seek(Dir, Pos1, Pos2):-
 asdw(Dir, Pos1, NextPos),
 seek(Dir,NextPos, Pos2).
+
+
+move_campers([],_,_,[]).
+
+move_campers([H|T], P1Pos, BallList, [H1| T1]):-
+    move_camper(H, P1Pos, BallList, H1),
+    move_campers(T, P1Pos, BallList, T1).
+
+
+move_camper(CamperPos,PlayerPos, BallList, NextPos):-
+    ( \+enemyTarget(CamperPos,_,_) -> assert(enemyTarget(CamperPos , n/a, [])); true),
+    next_camper_target(CamperPos,BallList,Target),
+    get_target_path(CamperPos,Target, [NextPos|NextPath]),
+    (seek(_,NextPos,PlayerPos), NextTarget = PlayerPos ;NextTarget = Target),
+    writeln(NextTarget),
+    retractall(enemyTarget(CamperPos,_,_)),
+    assert(enemyTarget(NextPos, NextTarget, NextPath)).
 
 
 

@@ -1,0 +1,41 @@
+% Movimento casuale del nemico
+nemico_vaga(PosizioneCorrente, NuovaPosizione) :-
+    findall(Adiacente, adiacente(PosizioneCorrente, Adiacente, 1), MossePossibili),
+    random_member(NuovaPosizione, MossePossibili).
+
+% Verifica se il nemico vede il giocatore sulla stessa riga o colonna (senza ostacoli)
+vede_giocatore(NemicoPos, GiocatorePos) :-
+    NemicoPos = X/Y,
+    GiocatorePos = X/YG,  % stessa colonna
+    percorso_libero_verticale(Y, YG, X).
+
+vede_giocatore(NemicoPos, GiocatorePos) :-
+    NemicoPos = X/Y,
+    GiocatorePos = XG/Y,  % stessa riga
+    percorso_libero_orizzontale(X, XG, Y).
+
+% Percorso libero verticalmente
+percorso_libero_verticale(Y1, Y2, X) :-
+    MinY is min(Y1, Y2),
+    MaxY is max(Y1, Y2),
+    forall(between(MinY, MaxY, Y), p(X/Y)).
+
+% Percorso libero orizzontalmente
+percorso_libero_orizzontale(X1, X2, Y) :-
+    MinX is min(X1, X2),
+    MaxX is max(X1, X2),
+    forall(between(MinX, MaxX, X), p(X/Y)).
+
+% Comportamento del nemico: vaga o insegue il giocatore
+move_follower(NemicoPos, GiocatorePos, NuovaPosizione) :-
+    (   vede_giocatore(NemicoPos, GiocatorePos) -> % se il nemico vede il giocatore allora lo insegue con A* senno continua a vagare
+        a_star_prima_mossa(NemicoPos, GiocatorePos, NuovaPosizione)
+    ;   nemico_vaga(NemicoPos, NuovaPosizione)
+    ).
+
+
+move_followers([],_,[]).
+
+move_followers([H|T], P1Pos, [H1| T1]):-
+    move_follower(H, P1Pos, H1),
+    move_followers(T, P1Pos, T1).

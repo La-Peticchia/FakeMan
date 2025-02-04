@@ -3,6 +3,7 @@
 :- [mappa_grafica].
 :- [movimentopupi2].
 :- [camper_utilities].
+:- [follower_utilities].
 
 :- dynamic playerPos/2.
 :- dynamic ballPos/2.
@@ -39,32 +40,19 @@ play(Window, [@p1, P1Pos, P2Pos, BallList]) :-
 
 play(Window, [@p2, P1Pos, P2Pos, BallList]) :-
     writeln("p2 turn"),
-    move_campers(P2Pos, P1Pos, BallList, NewP2Pos),
+    split_list(P2Pos, Followers, Campers),
+    writeln("Test1"),
+    move_followers(Followers, P1Pos, NewFolPos),
+    writeln("Test2"),
+
+    move_campers(Campers, P1Pos, BallList, NewCamPos),
     findall(Add, (playerPos(Add, _) , Add \= @p1), Enemies),
+    append(NewFolPos, NewCamPos, NewP2Pos),
     moveEnemies(Window, Enemies, NewP2Pos),
     (
         check_list_adiacent(NewP2Pos, P1Pos) -> writeln("You Lose"), true;
         play(Window,[@p1, P1Pos, NewP2Pos, BallList])
     ).
-
-
-move_campers([],_,_,[]).
-
-move_campers([H|T], P1Pos, BallList, [H1| T1]):-
-    camper_move(H, P1Pos, BallList, H1),
-    move_campers(T, P1Pos, BallList, T1).
-
-
-camper_move(CamperPos,PlayerPos, BallList, NextPos):-
-    ( \+enemyTarget(CamperPos,_,_) -> assert(enemyTarget(CamperPos , n/a, [])); true),
-    next_camper_target(CamperPos,BallList,Target),
-    get_target_path(CamperPos,Target, Path),
-    [NextPos|NextPath] = Path,
-    (seek(_,NextPos,PlayerPos), NextTarget = PlayerPos ;NextTarget = Target),
-    writeln(NextTarget),
-    retractall(enemyTarget(CamperPos,_,_)),
-    assert(enemyTarget(NextPos, NextTarget, NextPath)).
-
 
 
 moveEnemies(_, [], []).
@@ -85,7 +73,7 @@ create_objects(Window) :-
     PX is X*20+2.5, PY is Y*20+2.5,
     send(Window, display,Player1, point(PX,PY)),
 
-    spawnEnemies(Window, [19/14, 18/7]),
+    spawnEnemies(Window, [ 5/14, 14/12, 19/14, 18/7]),
 
     spawnBalls(Window, 3).
 
@@ -152,3 +140,13 @@ check_list_adiacent([H|T], Pos) :-
     adiacente(H, Pos, _);
     check_list_adiacent(T, Pos).
 
+split_list(List, First, Second):-
+    length(List, N),
+    split(List, floor(N/2), First, Second).
+
+
+split(T, 0, [], T).
+split([H|T], N, [H1|T1], Second):-
+    H1 = H,
+    N1 is N - 1,
+    split(T, N1, T1, Second).

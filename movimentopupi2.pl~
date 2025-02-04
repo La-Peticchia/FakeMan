@@ -62,7 +62,6 @@ a_star_percorso(Start, Goal, Path):-
 a_star_search_prima_mossa([node(Pos, C, _, Path)|_], _, Pos, C, TotPath) :-
     reverse([Pos|Path], [_|TotPath]).
 
-    % Ritorna solo il primo passo dopo la posizione iniziale
 a_star_search_prima_mossa([node(Pos, G, _, Path)|Open], Closed, Goal, C, TotPath) :-
     findall(
         node(Next, GNew, F, [Pos|Path]),
@@ -117,7 +116,7 @@ percorso_libero_orizzontale(X1, X2, Y) :-
 
 % Comportamento del nemico: vaga o insegue il giocatore
 muovi_nemico(NemicoPos, GiocatorePos, NuovaPosizione) :-
-    (   vede_giocatore(NemicoPos, GiocatorePos) ->
-        a_star_prima_mossa(NemicoPos, GiocatorePos, NuovaPosizione)  % Inseguimento con A*
-    ;   nemico_vaga(NemicoPos, NuovaPosizione)                      % Movimento casuale
+    (   vede_giocatore(NemicoPos, GiocatorePos) -> % se il nemico vede il giocatore allora lo insegue con A* senno continua a vagare
+        a_star_prima_mossa(NemicoPos, GiocatorePos, NuovaPosizione)
+    ;   nemico_vaga(NemicoPos, NuovaPosizione)
     ).
