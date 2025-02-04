@@ -82,8 +82,9 @@ GameOver_Sound = pygame.mixer.Sound("Sounds/GameOver.mp3")
 Move_Sound = pygame.mixer.Sound("Sounds/Move.mp3")
 
 #Caricamento Canzoni
-GameSounds = [pygame.mixer.Sound(f"Sounds/MusicGame{i}.mp3") for i in range(1, 10)]
-print(GameSounds)
+if MUSIC_ON:
+    GameSounds = [pygame.mixer.Sound(f"Sounds/MusicGame{i}.mp3") for i in range(1, 10)]
+
 
 # Crea la finestra
 schermo = pygame.display.set_mode((LARGHEZZA_FINESTRA, ALTEZZA_FINESTRA))
@@ -259,8 +260,8 @@ def musica_casuale():
     music = random.choice(GameSounds)
     music.set_volume(0.5)
     music.play()
-
-musica_casuale()
+if MUSIC_ON:
+    musica_casuale()
 disegna_Pallini()
 # Loop principale
 running = True
