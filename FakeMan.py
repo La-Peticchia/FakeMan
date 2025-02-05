@@ -34,7 +34,7 @@ NUMBER_OF_TURN_INFRA_GENERATION = 5
 NUMBER_OF_PALLINI = 2
 IMMORTALITY = False
 SOUND_ON = True
-MUSIC_ON = True
+MUSIC_ON = False
 
 #booleani per il controllo delle animazioni
 playerDirection = 0 #1 is right || #0 is left
