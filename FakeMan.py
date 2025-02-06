@@ -2,7 +2,7 @@ from pyswip import Prolog
 import pygame
 import re
 import random
-
+import copy
 
 # Inizializza Pygame
 pygame.init()
@@ -12,7 +12,8 @@ pygame.mixer.init()
 DIM_QUADRATO = 30         # Dimensione di un quadrato
 OFFSET = 5                # Spazio tra i quadrati
 RIGHE = 15                # Numero di righe
-COLONNE = 20       
+COLONNE = 20   
+FPS = 60    
 
 # Altezza finestra
 LARGHEZZA_FINESTRA =  COLONNE * (DIM_QUADRATO + OFFSET)  # Larghezza adattiva finestra
@@ -26,15 +27,27 @@ BLU = (0,0,255)
 VERDE = (0,255,0)
 GIALLO = (255,255,0)
 AZZURRO = (0,255,255)
+GRIGIO = (120,120,120)
 
+def setInitialFlag():
 #Flag
-MONSTER_GENERATION = True
-MAX_MONSTER_NUMBER = 3
-NUMBER_OF_TURN_INFRA_GENERATION = 5
-NUMBER_OF_PALLINI = 2
-IMMORTALITY = False
-SOUND_ON = True
-MUSIC_ON = False
+    global MONSTER_GENERATION
+    global MAX_MONSTER_NUMBER 
+    global NUMBER_OF_TURN_INFRA_GENERATION 
+    global NUMBER_OF_PALLINI 
+    global IMMORTALITY
+    global SOUND_ON 
+    global MUSIC_ON
+        
+    MONSTER_GENERATION = True
+    MAX_MONSTER_NUMBER = 3
+    NUMBER_OF_TURN_INFRA_GENERATION = 5
+    NUMBER_OF_PALLINI = 3
+    IMMORTALITY = False
+    SOUND_ON = True
+    MUSIC_ON = True
+
+setInitialFlag()
 
 #booleani per il controllo delle animazioni
 playerDirection = 0 #1 is right || #0 is left
@@ -92,12 +105,18 @@ pygame.display.set_caption("Griglia con player")
 
 # Posizione iniziale del player
 player_pos = [14,19]  # Riga, Colonna
+player_pos_memory = player_pos.copy()
 
 nemici = [
     {"pos": [0, 1], "sprite": sprite_enemy1, "direction": 0},
     {"pos": [0, 19], "sprite": sprite_enemy2, "direction": 0}
     #{"pos": [13, 0], "sprite": sprite_enemy3, "direction": 0}
 ]
+
+nemici_memory = [{"pos": enemy["pos"][:],  # Copia la posizione (nuova lista)
+                  "sprite": enemy["sprite"],  # Mantiene lo stesso sprite
+                  "direction": enemy["direction"]}  # Copia la direzione
+                 for enemy in nemici]
 
 prolog = Prolog()
 prolog.consult("movimentoPupi2.pl")
@@ -108,15 +127,6 @@ down_pressed = False
 left_pressed = False
 right_pressed = False
 
-a_pressed = False
-s_pressed = False
-w_pressed = False
-d_pressed = False
-
-f_pressed = False
-g_pressed = False
-h_pressed = False
-t_pressed = False
 
 labirinto = [[0 for colonne in range(COLONNE)] for righe in range(RIGHE)]
 
@@ -127,6 +137,11 @@ with open("labirinto.txt", "r") as file:
           riga = riga.strip()
           x, y = map(int, riga.strip().split(","))
           labirinto[x][y] = 1
+          
+
+
+#Funzioni di gestione della griglia 
+
 
 def disegna_Pallini():
     for riga in range(RIGHE):
@@ -147,6 +162,8 @@ def disegna_griglia():
     global stopCondition
     global winPlayed
     global gameOverPlayer
+    
+    
     for riga in range(RIGHE):
         for colonna in range(COLONNE):
             x = colonna * (DIM_QUADRATO + OFFSET)
@@ -188,6 +205,7 @@ def disegna_griglia():
         if winPlayed == False and SOUND_ON:
             Win_sound.play()
             winPlayed = True
+            music.stop()
         
         
     
@@ -203,6 +221,7 @@ def disegna_griglia():
                     if gameOverPlayer == False and SOUND_ON:
                         GameOver_Sound.play()
                         gameOverPlayer = True
+                        music.stop()
         
                             
             
@@ -257,95 +276,128 @@ def estrai_numeri(stringa):
 
 def musica_casuale():
     global GameSounds
+    global music
     music = random.choice(GameSounds)
     music.set_volume(0.5)
     music.play()
+    
 if MUSIC_ON:
     musica_casuale()
 disegna_Pallini()
 # Loop principale
 running = True
 
+def restart():
+    global gameOverPlayer
+    global stopCondition
+    global player_pos
+    global nemici
+    global winPlayed
+    global pallinePrese
+    global player_pos_memory
+    global nemici_memory
+    
+    player_pos = player_pos_memory
+    nemici = nemici_memory
+    stopCondition = False
+    
+    gameOverPlayer = True
+    winPlayed = True
+    
+    pallinePrese = 0
+    
+    disegna_Pallini()
+    disegna_griglia()
+    setInitialFlag()
+
+    
+    
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+            
+        # Controllo degli input per spostare il player
+        keys = pygame.key.get_pressed()
+        
+        if stopCondition and event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_r:
+                restart()
 
-    # Controllo degli input per spostare il player
-    keys = pygame.key.get_pressed()
-    
-    #PLAYER1
+        # Gestione del movimento quando i tasti sono premuti
+        if keys[pygame.K_UP] and not up_pressed and player_pos[0] > 0 and labirinto[player_pos[0]-1][player_pos[1]] != 1 and stopCondition==False:
+            player_pos[0] -= 1
+            up_pressed = True  # Set flag per evitare il movimento continuo
+            numeroMosse = aggiorna_posizione_nemico(numeroMosse)
+            if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
+                aggiungi_nemico()
+            if SOUND_ON:
+                Move_Sound.play() 
+            print(player_pos)
+            
+        if keys[pygame.K_DOWN] and not down_pressed and player_pos[0] < RIGHE - 1 and labirinto[player_pos[0]+1][player_pos[1]] != 1 and stopCondition==False:
+            player_pos[0] += 1
+            down_pressed = True  # Set flag per evitare il movimento continuo
+            numeroMosse = aggiorna_posizione_nemico(numeroMosse)
+            if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
+                aggiungi_nemico()
+            if SOUND_ON:
+                Move_Sound.play()     
+            print(player_pos)
+            
+        if keys[pygame.K_LEFT] and not left_pressed and player_pos[1] > 0 and labirinto[player_pos[0]][player_pos[1]-1] != 1 and stopCondition==False:
+            player_pos[1] -= 1
+            left_pressed = True  # Set flag per evitare il movimento continuo
+            numeroMosse = aggiorna_posizione_nemico(numeroMosse)
+            if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
+                aggiungi_nemico()
+            #Gira lo sprite seguendo la direzione
+            if playerDirection==1:
+                sprite_player = pygame.transform.flip(sprite_player, True, False)
+                playerDirection = 0
+            if SOUND_ON:
+                Move_Sound.play() 
+            print(player_pos)
+            
+        if keys[pygame.K_RIGHT] and not right_pressed and player_pos[1] < COLONNE - 1 and labirinto[player_pos[0]][player_pos[1]+1] != 1 and stopCondition==False:
+            player_pos[1] += 1
+            right_pressed = True  # Set flag per evitare il movimento continuo
+            numeroMosse = aggiorna_posizione_nemico(numeroMosse)
+            if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
+                aggiungi_nemico()
+            if SOUND_ON:
+                Move_Sound.play()
+            print(player_pos)
+            
+            #Gira lo sprite seguendo la direzione
+            if playerDirection==0:
+                sprite_player = pygame.transform.flip(sprite_player, True, False)
+                playerDirection = 1
 
-    # Gestione del movimento quando i tasti sono premuti
-    if keys[pygame.K_UP] and not up_pressed and player_pos[0] > 0 and labirinto[player_pos[0]-1][player_pos[1]] != 1 and stopCondition==False:
-        player_pos[0] -= 1
-        up_pressed = True  # Set flag per evitare il movimento continuo
-        numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
-            aggiungi_nemico()
-        if SOUND_ON:
-            Move_Sound.play() 
+        # Se il tasto viene rilasciato, resettare il flag per il movimento "a casella singola"
+        if not keys[pygame.K_UP]:
+            up_pressed = False
+        if not keys[pygame.K_DOWN]:
+            down_pressed = False
+        if not keys[pygame.K_LEFT]:
+            left_pressed = False
+        if not keys[pygame.K_RIGHT]:
+            right_pressed = False
+            
         
-    if keys[pygame.K_DOWN] and not down_pressed and player_pos[0] < RIGHE - 1 and labirinto[player_pos[0]+1][player_pos[1]] != 1 and stopCondition==False:
-        player_pos[0] += 1
-        down_pressed = True  # Set flag per evitare il movimento continuo
-        numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
-            aggiungi_nemico()
-        if SOUND_ON:
-            Move_Sound.play()     
+            
+        #ENEMY1
+            
         
-    if keys[pygame.K_LEFT] and not left_pressed and player_pos[1] > 0 and labirinto[player_pos[0]][player_pos[1]-1] != 1 and stopCondition==False:
-        player_pos[1] -= 1
-        left_pressed = True  # Set flag per evitare il movimento continuo
-        numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
-            aggiungi_nemico()
-        #Gira lo sprite seguendo la direzione
-        if playerDirection==1:
-            sprite_player = pygame.transform.flip(sprite_player, True, False)
-            playerDirection = 0
-        if SOUND_ON:
-            Move_Sound.play() 
+        # Riempie lo schermo con il colore di sfondo
+        schermo.fill(NERO)
+        #print(player_pos)
+        #print(enemy_pos)
+        # Disegna la griglia
+        disegna_griglia()
         
-    if keys[pygame.K_RIGHT] and not right_pressed and player_pos[1] < COLONNE - 1 and labirinto[player_pos[0]][player_pos[1]+1] != 1 and stopCondition==False:
-        player_pos[1] += 1
-        right_pressed = True  # Set flag per evitare il movimento continuo
-        numeroMosse = aggiorna_posizione_nemico(numeroMosse)
-        if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
-            aggiungi_nemico()
-        if SOUND_ON:
-            Move_Sound.play()
-          
-        #Gira lo sprite seguendo la direzione
-        if playerDirection==0:
-            sprite_player = pygame.transform.flip(sprite_player, True, False)
-            playerDirection = 1
-
-    # Se il tasto viene rilasciato, resettare il flag per il movimento "a casella singola"
-    if not keys[pygame.K_UP]:
-        up_pressed = False
-    if not keys[pygame.K_DOWN]:
-        down_pressed = False
-    if not keys[pygame.K_LEFT]:
-        left_pressed = False
-    if not keys[pygame.K_RIGHT]:
-        right_pressed = False
-        
-    
-        
-    #ENEMY1
-        
-    
-    # Riempie lo schermo con il colore di sfondo
-    schermo.fill(NERO)
-    #print(player_pos)
-    #print(enemy_pos)
-    # Disegna la griglia
-    disegna_griglia()
-    
-    # Aggiorna il display
+        # Aggiorna il display
     pygame.display.flip()
-
+    pygame.time.Clock().tick(FPS)
 # Chiudi Pygame
 pygame.quit()
