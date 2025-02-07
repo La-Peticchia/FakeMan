@@ -119,7 +119,7 @@ nemici_memory = [{"pos": enemy["pos"][:],  # Copia la posizione (nuova lista)
                  for enemy in nemici]
 
 prolog = Prolog()
-prolog.consult("follower_Utilities.pl")
+prolog.consult("camper_Utilities.pl")
 
 # Flag per evitare il movimento continuo
 up_pressed = False
@@ -150,8 +150,11 @@ def disegna_Pallini():
     for i in range(NUMBER_OF_PALLINI):
         cell = random.choice(validCellGroup)
         if cell not in cellWithPallino:  # Controlla che il pallino non sia già stato aggiunto
-            print(cellWithPallino)
+            
             cellWithPallino.append(cell)
+            #print(cellWithPallino[0])
+       
+            
        
         
                 
@@ -207,8 +210,6 @@ def disegna_griglia():
             if MUSIC_ON:
                 music.stop()
         
-        
-    
     
     else:
         for nemico in nemici:
@@ -228,7 +229,8 @@ def disegna_griglia():
             
 #Funzione per aggiornare il movimento del nemico
 def aggiorna_posizione_nemico(numMosse):
-    
+    global cellWithPallino
+    listaPallini = convertiProlog(cellWithPallino)
     for nemico in nemici:
         nemico_pos = nemico["pos"]
         nemico_sprite = nemico["sprite"]
@@ -237,7 +239,7 @@ def aggiorna_posizione_nemico(numMosse):
         # Calcolo della futura direzione e posizione
         start = f"{nemico_pos[0]}/{nemico_pos[1]}"
         goal = f"{player_pos[0]}/{player_pos[1]}"
-        query = f"move_follower({start}, {goal}, NuovaPosizione)"
+        query = f"move_camper({start}, {goal},{listaPallini}, NextPos)"
         
         result = list(prolog.query(query))
         risultato = estrai_numeri(str(result))
@@ -311,6 +313,10 @@ def restart():
     disegna_griglia()
     setInitialFlag()
 
+def convertiProlog(lista):
+    nuova_lista = [f"{x}/{y}" for x, y in lista]
+    return nuova_lista
+
     
     
 while running:
@@ -359,6 +365,8 @@ while running:
             if SOUND_ON:
                 Move_Sound.play() 
             print(player_pos)
+            
+            
             
         if keys[pygame.K_RIGHT] and not right_pressed and player_pos[1] < COLONNE - 1 and labirinto[player_pos[0]][player_pos[1]+1] != 1 and stopCondition==False:
             player_pos[1] += 1

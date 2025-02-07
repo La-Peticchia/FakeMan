@@ -1,3 +1,5 @@
+:-[fakeman].
+:-[movimentopupi2].
 
 :- dynamic enemyTarget/3.
 
