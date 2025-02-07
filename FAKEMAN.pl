@@ -1,235 +1,235 @@
-bianca(0, 1).%nemico 1
-bianca(0, 19).%nemico 2
-bianca(14, 9).%giocatore verde
-bianca(1, 1).
-biamca(1, 0).
-bianca(2, 0).
-bianca(3, 0).
-bianca(3, 1).
-bianca(3, 2).
-bianca(3, 3).
-bianca(3, 4).
-bianca(2, 4).
-bianca(1, 4).
-bianca(1, 3).
-bianca(1, 5).
-bianca(1, 6).
-bianca(2, 6).
-bianca(3, 6).
-bianca(4, 6).
-bianca(5, 6).
-bianca(3, 7).
-bianca(3, 8).
-bianca(3, 9).
-bianca(3, 10).
-bianca(3, 11).
-bianca(2, 11).
-bianca(1, 11).
-bianca(1, 10).
-bianca(1, 9).
-bianca(1, 8).
-bianca(3, 12).
-bianca(3, 13).
-bianca(2, 13).
-bianca(1, 13).
-bianca(0, 13).%Pallino arancione
-bianca(5, 0).
-bianca(5, 1).
-bianca(5, 2).
-bianca(5, 3).
-bianca(5, 4).
-bianca(4, 4).
-bianca(7, 0).
-bianca(8, 0).
-bianca(9, 0).
-bianca(10, 0).
-bianca(11, 0).
-bianca(12, 0).
-bianca(13, 0).
-bianca(14, 0).
-bianca(15, 0).
-bianca(16, 0).
-bianca(17, 0).
-bianca(18, 0).
-bianca(19, 0).
-bianca(6, 2).
-bianca(7, 2).
-bianca(7, 3).
-bianca(7, 4).
-bianca(8, 4).
-bianca(9, 4).
-bianca(10, 4).
-bianca(11, 4).
-bianca(12, 4).
-bianca(13, 4).
-bianca(10, 1).
-bianca(10, 2).%pallina arancione
-bianca(9, 2).
-bianca(19, 1).
-bianca(19, 2).
-bianca(19, 3).
-bianca(19, 4).
-bianca(19, 5).
-bianca(19, 9).
-bianca(19, 10).
-bianca(19, 11).
-bianca(19, 13).
-bianca(19, 14).
-bianca(5, 14).
-bianca(6, 14).
-bianca(7, 14).
-bianca(8, 14).
-bianca(9, 14).
-bianca(10, 14).
-bianca(11, 14).
-bianca(12, 14).
-bianca(13, 14).
-bianca(14, 14).
-bianca(15, 14).
-bianca(16, 14).
-bianca(17, 14).
-bianca(18, 14).
-bianca(17, 13).%pallina arancione
-bianca(18, 13).
-bianca(5, 13).
-bianca(18, 1).
-bianca(18, 2).
-bianca(18, 3).
-bianca(18, 4).
-bianca(18, 5).
-bianca(18, 6).
-bianca(18, 7).
-bianca(18, 8).
-bianca(18, 9).
-bianca(18, 10).
-bianca(18, 11).
-bianca(17, 3).
-bianca(17, 7).
-bianca(17, 8).
-bianca(17, 9).
-bianca(17, 10).
-bianca(17, 11).
-bianca(17, 12).
-bianca(16, 1).
-bianca(16, 2).
-bianca(16, 3).
-bianca(16, 5).
-bianca(16, 9).
-bianca(16, 11).
-bianca(16, 12).
-bianca(15, 2).
-bianca(15, 3).
-bianca(15, 4).
-bianca(15, 5).
-bianca(15, 6).
-bianca(15, 7).
-bianca(15, 9).
-bianca(15, 11).
-bianca(15, 12).
-bianca(14, 2).
-bianca(14, 3).
-bianca(14, 6).
-bianca(14, 7).
-bianca(14, 9).
-bianca(14, 10).
-bianca(14, 11).
-bianca(14, 12).
-bianca(14, 13).
-bianca(13, 2).
-bianca(13, 3).
-bianca(13, 5).
-bianca(13, 6).
-bianca(13, 7).
-bianca(13, 9).
-bianca(13, 10).
-bianca(13, 12).
-bianca(13, 13).
-bianca(12, 2).
-bianca(12, 3).
-bianca(12, 7).
-bianca(12, 9).
-bianca(12, 10).
-bianca(12, 12).
-bianca(12, 13).
-bianca(11, 6).
-bianca(11, 7).
-bianca(11, 9).
-bianca(11, 10).
-bianca(11, 11).
-bianca(11, 12).
-bianca(11, 13).
-bianca(10, 6).
-bianca(10, 13).
-bianca(9, 6).
-bianca(9, 8).
-bianca(9, 9).
-bianca(9, 10).
-bianca(9, 11).
-bianca(9, 12).
-bianca(9, 13).
-bianca(8, 6).
-bianca(8, 8).
-bianca(7, 6).
-bianca(7, 7).
-bianca(7, 8).
-bianca(7, 10).
-bianca(7, 11).
-bianca(7, 12).
-bianca(7, 13).
-bianca(6, 7).
-bianca(6, 10).
-bianca(5, 7).
-bianca(5, 9).
-bianca(5, 10).
-bianca(5, 11).
-bianca(4, 11).
-bianca(0, 0).
-bianca(0, 1).
-bianca(0, 2).
-bianca(0, 3).
-bianca(0, 4).
-bianca(0, 5).
-bianca(0, 6).
-bianca(0, 7).
-bianca(0, 8).
-bianca(0, 9).
-bianca(0, 10).
-bianca(0, 11).
-bianca(0, 12).
-bianca(0, 14).
-bianca(1, 14).
-bianca(2, 14).
-bianca(3, 14).
-bianca(4, 14).
-bianca(10, 8).
-bianca(11, 8).
-bianca(12, 8).
-bianca(13, 8).
-bianca(14, 8).
-bianca(15, 8).
-bianca(16, 8).
-bianca(5, 8).
-bianca(7, 9).
-bianca(6, 4).
-bianca(6, 5).
-bianca(6, 6).
-bianca(5, 5).
-bianca(7, 5).
-bianca(8, 1).
-bianca(8, 2).
-bianca(8, 3).
-bianca(1, 7).
-bianca(2, 1).
-bianca(2, 2).
-bianca(2, 3).
-bianca(5, 12).
-bianca(6, 12).
-bianca(6, 13).
-bianca(11, 1).
-bianca(11, 2).
-bianca(11, 3).
-bianca(16, 6).
-bianca(17, 6).
+p(1/0). %nemico 1
+p(19/0). %nemico 2
+p(9/14). %giocatore verde
+p(1/1).
+p(0/1).
+p(0/2).
+p(0/3).
+p(1/3).
+p(2/3).
+p(3/3).
+p(4/3).
+p(4/2).
+p(4/1).
+p(3/1).
+p(5/1).
+p(6/1).
+p(6/2).
+p(6/3).
+p(6/4).
+p(6/5).
+p(7/3).
+p(8/3).
+p(9/3).
+p(10/3).
+p(11/3).
+p(11/2).
+p(11/1).
+p(10/1).
+p(9/1).
+p(8/1).
+p(12/3).
+p(13/3).
+p(13/2).
+p(13/1).
+p(13/0). %Pallino arancione
+p(0/5).
+p(1/5).
+p(2/5).
+p(3/5).
+p(4/5).
+p(4/4).
+p(0/7).
+p(0/8).
+p(0/9).
+p(0/10).
+p(0/11).
+p(0/12).
+p(0/13).
+p(0/14).
+p(0/15).
+p(0/16).
+p(0/17).
+p(0/18).
+p(0/19).
+p(2/6).
+p(2/7).
+p(3/7).
+p(4/7).
+p(4/8).
+p(4/9).
+p(4/10).
+p(4/11).
+p(4/12).
+p(4/13).
+p(1/10).
+p(2/10). %pallina arancione
+p(2/9).
+p(1/19).
+p(2/19).
+p(3/19).
+p(4/19).
+p(5/19).
+p(9/19).
+p(10/19).
+p(11/19).
+p(13/19).
+p(14/19).
+p(14/5).
+p(14/6).
+p(14/7).
+p(14/8).
+p(14/9).
+p(14/10).
+p(14/11).
+p(14/12).
+p(14/13).
+p(14/14).
+p(14/15).
+p(14/16).
+p(14/17).
+p(14/18).
+p(13/17). %pallina arancione
+p(13/18).
+p(13/5).
+p(1/18).
+p(2/18).
+p(3/18).
+p(4/18).
+p(5/18).
+p(6/18).
+p(7/18).
+p(8/18).
+p(9/18).
+p(10/18).
+p(11/18).
+p(3/17).
+p(7/17).
+p(8/17).
+p(9/17).
+p(10/17).
+p(11/17).
+p(12/17).
+p(1/16).
+p(2/16).
+p(3/16).
+p(5/16).
+p(9/16).
+p(11/16).
+p(12/16).
+p(2/15).
+p(3/15).
+p(4/15).
+p(5/15).
+p(6/15).
+p(7/15).
+p(9/15).
+p(11/15).
+p(12/15).
+p(2/14).
+p(3/14).
+p(6/14).
+p(7/14).
+p(9/14).
+p(10/14).
+p(11/14).
+p(12/14).
+p(13/14).
+p(2/13).
+p(3/13).
+p(5/13).
+p(6/13).
+p(7/13).
+p(9/13).
+p(10/13).
+p(12/13).
+p(13/13).
+p(2/12).
+p(3/12).
+p(7/12).
+p(9/12).
+p(10/12).
+p(12/12).
+p(13/12).
+p(6/11).
+p(7/11).
+p(9/11).
+p(10/11).
+p(11/11).
+p(12/11).
+p(13/11).
+p(6/10).
+p(13/10).
+p(6/9).
+p(8/9).
+p(9/9).
+p(10/9).
+p(11/9).
+p(12/9).
+p(13/9).
+p(6/8).
+p(8/8).
+p(6/7).
+p(7/7).
+p(8/7).
+p(10/7).
+p(11/7).
+p(12/7).
+p(13/7).
+p(7/6).
+p(10/6).
+p(7/5).
+p(9/5).
+p(10/5).
+p(11/5).
+p(11/4).
+p(0/0).
+p(1/0).
+p(2/0).
+p(3/0).
+p(4/0).
+p(5/0).
+p(6/0).
+p(7/0).
+p(8/0).
+p(9/0).
+p(10/0).
+p(11/0).
+p(12/0).
+p(14/0).
+p(14/1).
+p(14/2).
+p(14/3).
+p(14/4).
+p(8/10).
+p(8/11).
+p(8/12).
+p(8/13).
+p(8/14).
+p(8/15).
+p(8/16).
+p(8/5).
+p(9/7).
+p(4/6).
+p(5/6).
+p(6/6).
+p(5/5).
+p(5/7).
+p(1/8).
+p(2/8).
+p(3/8).
+p(7/1).
+p(1/2).
+p(2/2).
+p(3/2).
+p(12/5).
+p(12/6).
+p(13/6).
+p(1/11).
+p(2/11).
+p(3/11).
+p(6/16).
+p(6/17).
 
 
 
