@@ -40,12 +40,12 @@ def setInitialFlag():
     global MUSIC_ON
         
     MONSTER_GENERATION = True
-    MAX_MONSTER_NUMBER = 3
+    MAX_MONSTER_NUMBER = 5
     NUMBER_OF_TURN_INFRA_GENERATION = 5
     NUMBER_OF_PALLINI = 3
     IMMORTALITY = False
     SOUND_ON = True
-    MUSIC_ON = True
+    MUSIC_ON = False
 
 setInitialFlag()
 
@@ -119,7 +119,7 @@ nemici_memory = [{"pos": enemy["pos"][:],  # Copia la posizione (nuova lista)
                  for enemy in nemici]
 
 prolog = Prolog()
-prolog.consult("movimentoPupi2.pl")
+prolog.consult("follower_Utilities.pl")
 
 # Flag per evitare il movimento continuo
 up_pressed = False
@@ -131,7 +131,7 @@ right_pressed = False
 labirinto = [[0 for colonne in range(COLONNE)] for righe in range(RIGHE)]
 
 
-with open("labirinto.txt", "r") as file:
+with open("PiastrelleNere.txt", "r") as file:
      
      for riga in file:
           riga = riga.strip()
@@ -139,9 +139,7 @@ with open("labirinto.txt", "r") as file:
           labirinto[x][y] = 1
           
 
-
 #Funzioni di gestione della griglia 
-
 
 def disegna_Pallini():
     for riga in range(RIGHE):
@@ -152,6 +150,7 @@ def disegna_Pallini():
     for i in range(NUMBER_OF_PALLINI):
         cell = random.choice(validCellGroup)
         if cell not in cellWithPallino:  # Controlla che il pallino non sia già stato aggiunto
+            print(cellWithPallino)
             cellWithPallino.append(cell)
        
         
@@ -205,7 +204,8 @@ def disegna_griglia():
         if winPlayed == False and SOUND_ON:
             Win_sound.play()
             winPlayed = True
-            music.stop()
+            if MUSIC_ON:
+                music.stop()
         
         
     
@@ -221,7 +221,8 @@ def disegna_griglia():
                     if gameOverPlayer == False and SOUND_ON:
                         GameOver_Sound.play()
                         gameOverPlayer = True
-                        music.stop()
+                        if MUSIC_ON:
+                            music.stop()
         
                             
             
@@ -236,7 +237,7 @@ def aggiorna_posizione_nemico(numMosse):
         # Calcolo della futura direzione e posizione
         start = f"{nemico_pos[0]}/{nemico_pos[1]}"
         goal = f"{player_pos[0]}/{player_pos[1]}"
-        query = f"a_star_prima_mossa({start}, {goal}, NextMove)"
+        query = f"move_follower({start}, {goal}, NuovaPosizione)"
         
         result = list(prolog.query(query))
         risultato = estrai_numeri(str(result))
