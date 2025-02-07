@@ -1,3 +1,5 @@
+:- [fakeman].
+:-[movimentopupi2].
 :- dynamic memoria_ultima_posizione/2.
 
 % Movimento casuale del nemico

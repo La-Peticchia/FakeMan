@@ -1,4 +1,5 @@
 :-[mappaprolog2].
+%:-[fakeman].
 
 
 %Euristica: distanza Manhattan

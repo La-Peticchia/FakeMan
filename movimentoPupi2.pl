@@ -1,3 +1,6 @@
+%:-[mappaprolog2].
+:-[fakeman].
+
 
 %Euristica: distanza Manhattan
 heuristic(X1/Y1, X2/Y2, H) :-
