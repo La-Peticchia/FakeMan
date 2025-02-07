@@ -1,4 +1,7 @@
-% Euristica: distanza Manhattan
+:-[mappaprolog2].
+
+
+%Euristica: distanza Manhattan
 heuristic(X1/Y1, X2/Y2, H) :-
     H is abs(X1 - X2) + abs(Y1 - Y2).
 

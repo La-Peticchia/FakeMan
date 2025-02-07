@@ -74,7 +74,7 @@ create_objects(Window) :-
     PX is X*20+2.5, PY is Y*20+2.5,
     send(Window, display,Player1, point(PX,PY)),
 
-    spawnEnemies(Window, [ 5/13, 14/12, 18/11, 18/7]),
+    spawnEnemies(Window, [ 5/14, 14/12, 19/14, 18/7]),
 
     spawnBalls(Window, 3).
 

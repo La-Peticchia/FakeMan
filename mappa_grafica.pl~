@@ -1,7 +1,7 @@
 
-:-[mappa].
 
 disegna_pianta(Finestra, Nome) :-
+    retractall(p(_)),
     new(Finestra, picture(Nome)),
     send(Finestra, size, size(400, 300)),
     send(Finestra, open),  % apre la finestra grafica
