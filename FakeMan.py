@@ -40,7 +40,7 @@ def setInitialFlag():
     global MUSIC_ON
         
     MONSTER_GENERATION = True
-    MAX_MONSTER_NUMBER = 5
+    MAX_MONSTER_NUMBER = 1
     NUMBER_OF_TURN_INFRA_GENERATION = 5
     NUMBER_OF_PALLINI = 3
     IMMORTALITY = False
@@ -56,6 +56,7 @@ pallinePrese = 0
 stopCondition = False
 winPlayed = False
 gameOverPlayer = False
+previousPosition = [0,0]
 
 #Sprite player
 sprite_player = pygame.image.load("immagini/FakeMan.png")
@@ -108,18 +109,20 @@ player_pos = [14,19]  # Riga, Colonna
 player_pos_memory = player_pos.copy()
 
 nemici = [
-    {"pos": [0, 1], "sprite": sprite_enemy1, "direction": 0},
-    {"pos": [0, 19], "sprite": sprite_enemy2, "direction": 0}
+    {"pos": [0, 1], "sprite": sprite_enemy1, "direction": 0, "role": 0}, #0 camper. 1 follower 
+    {"pos": [0, 19], "sprite": sprite_enemy2, "direction": 0, "role": 1}
     #{"pos": [13, 0], "sprite": sprite_enemy3, "direction": 0}
 ]
 
 nemici_memory = [{"pos": enemy["pos"][:],  # Copia la posizione (nuova lista)
                   "sprite": enemy["sprite"],  # Mantiene lo stesso sprite
-                  "direction": enemy["direction"]}  # Copia la direzione
+                  "direction": enemy["direction"], # Copia la direzione
+                  "role": enemy["role"]}  #Copia il ruolo
                  for enemy in nemici]
 
 prolog = Prolog()
 prolog.consult("camper_Utilities.pl")
+prolog.consult("follower_Utilities.pl")
 
 # Flag per evitare il movimento continuo
 up_pressed = False
@@ -152,7 +155,7 @@ def disegna_Pallini():
         if cell not in cellWithPallino:  # Controlla che il pallino non sia già stato aggiunto
             
             cellWithPallino.append(cell)
-            #print(cellWithPallino[0])
+            
        
             
        
@@ -205,6 +208,7 @@ def disegna_griglia():
         y = (ALTEZZA_FINESTRA - sprite_win.get_height()) // 2
         schermo.blit(sprite_win, (x, y))
         if winPlayed == False and SOUND_ON:
+            Win_sound.set_volume(0.5)
             Win_sound.play()
             winPlayed = True
             if MUSIC_ON:
@@ -220,6 +224,7 @@ def disegna_griglia():
                     y = (ALTEZZA_FINESTRA - sprite_lose.get_height()) // 2
                     schermo.blit(sprite_lose, (x, y))
                     if gameOverPlayer == False and SOUND_ON:
+                        GameOver_Sound.set_volume(0.1)
                         GameOver_Sound.play()
                         gameOverPlayer = True
                         if MUSIC_ON:
@@ -230,43 +235,71 @@ def disegna_griglia():
 #Funzione per aggiornare il movimento del nemico
 def aggiorna_posizione_nemico(numMosse):
     global cellWithPallino
+    global previousPosition
     listaPallini = convertiProlog(cellWithPallino)
     for nemico in nemici:
         nemico_pos = nemico["pos"]
         nemico_sprite = nemico["sprite"]
         nemico_dir = nemico["direction"]
+        nemico_role = nemico["role"]
         
+        
+        previousPosition = nemico_pos.copy()
         # Calcolo della futura direzione e posizione
         start = f"{nemico_pos[0]}/{nemico_pos[1]}"
         goal = f"{player_pos[0]}/{player_pos[1]}"
-        query = f"move_camper({start}, {goal},{listaPallini}, NextPos)"
+        queryCamper = f"move_camper({start}, {goal},{listaPallini}, NextPos)"
         
-        result = list(prolog.query(query))
-        risultato = estrai_numeri(str(result))
-        [prologX, prologY] = risultato
-
+        queryFollow = f"move_follower({start}, {goal}, NuovaPosizione)"
+        
+        
+        resultCamper = list(prolog.query(queryCamper))
+        resultFollower = list(prolog.query(queryFollow))
+        
+        risultatoCamper = estrai_numeri(str(resultCamper))
+        risultatoFollow = estrai_numeri(str(resultFollower))
+        
+        
+        try:
+            [prologXCamper, prologYCamper] = risultatoCamper
+            
+        except Exception as e:
+            [prologXCamper, prologYCamper] = [risultatoCamper[0],risultatoCamper[1]]
+            
+        
+        [prologXFollow, prologYFollow] = risultatoFollow
+               
+        
+        
         # Calcolo direzione per lo sprite
-        if nemico_pos[1] > prologY and nemico_dir == 0:
+        if nemico_pos[1] > prologYCamper and nemico_dir == 0:
             nemico["sprite"] = pygame.transform.flip(nemico_sprite, True, False)
             nemico["direction"] = 1
-        elif nemico_pos[1] < prologY and nemico_dir == 1:
+        elif nemico_pos[1] < prologYCamper and nemico_dir == 1:
             nemico["sprite"] = pygame.transform.flip(nemico_sprite, True, False)
             nemico["direction"] = 0
         
         # Aggiorna la posizione del nemico
-        nemico["pos"] = [prologX, prologY]
+        if nemico["role"] == 0:
+            nemico["pos"] = [prologXCamper, prologYCamper]
+            
+        else:
+            nemico["pos"] = [prologXFollow, prologYFollow]
+            
         
     numMosse = numMosse +1
-    print(numMosse)
+    
     return numMosse 
 
 def aggiungi_nemico():
     global nemici
+    role = random.sample([0,1],1)[0]
     if len(nemici)< MAX_MONSTER_NUMBER:
         nuovo_nemico = {
             "pos" : random.choice(posGroup),
             "sprite" : random.choice(spriteGroup),
-            "direction" : 0
+            "direction" : 0,
+            "role" : role
             
         }
         nemici.append(nuovo_nemico)
@@ -335,26 +368,29 @@ while running:
         if keys[pygame.K_UP] and not up_pressed and player_pos[0] > 0 and labirinto[player_pos[0]-1][player_pos[1]] != 1 and stopCondition==False:
             player_pos[0] -= 1
             up_pressed = True  # Set flag per evitare il movimento continuo
+            
             numeroMosse = aggiorna_posizione_nemico(numeroMosse)
             if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
                 aggiungi_nemico()
             if SOUND_ON:
                 Move_Sound.play() 
-            print(player_pos)
+            
             
         if keys[pygame.K_DOWN] and not down_pressed and player_pos[0] < RIGHE - 1 and labirinto[player_pos[0]+1][player_pos[1]] != 1 and stopCondition==False:
             player_pos[0] += 1
             down_pressed = True  # Set flag per evitare il movimento continuo
+            
             numeroMosse = aggiorna_posizione_nemico(numeroMosse)
             if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
                 aggiungi_nemico()
             if SOUND_ON:
                 Move_Sound.play()     
-            print(player_pos)
+            
             
         if keys[pygame.K_LEFT] and not left_pressed and player_pos[1] > 0 and labirinto[player_pos[0]][player_pos[1]-1] != 1 and stopCondition==False:
             player_pos[1] -= 1
             left_pressed = True  # Set flag per evitare il movimento continuo
+            
             numeroMosse = aggiorna_posizione_nemico(numeroMosse)
             if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
                 aggiungi_nemico()
@@ -364,19 +400,20 @@ while running:
                 playerDirection = 0
             if SOUND_ON:
                 Move_Sound.play() 
-            print(player_pos)
+            
             
             
             
         if keys[pygame.K_RIGHT] and not right_pressed and player_pos[1] < COLONNE - 1 and labirinto[player_pos[0]][player_pos[1]+1] != 1 and stopCondition==False:
             player_pos[1] += 1
             right_pressed = True  # Set flag per evitare il movimento continuo
+            
             numeroMosse = aggiorna_posizione_nemico(numeroMosse)
             if MONSTER_GENERATION  and numeroMosse % NUMBER_OF_TURN_INFRA_GENERATION == 0 and len(nemici)<= MAX_MONSTER_NUMBER:
                 aggiungi_nemico()
             if SOUND_ON:
                 Move_Sound.play()
-            print(player_pos)
+            
             
             #Gira lo sprite seguendo la direzione
             if playerDirection==0:
@@ -400,13 +437,12 @@ while running:
         
         # Riempie lo schermo con il colore di sfondo
         schermo.fill(NERO)
-        #print(player_pos)
-        #print(enemy_pos)
+      
         # Disegna la griglia
         disegna_griglia()
         
         # Aggiorna il display
     pygame.display.flip()
-    pygame.time.Clock().tick(FPS)
+    
 # Chiudi Pygame
 pygame.quit()
