@@ -1,3 +1,6 @@
+
+%:- dynamic memoria_ultima_posizione/2.
+
 % Movimento casuale del nemico
 nemico_vaga(PosizioneCorrente, NuovaPosizione) :-
     findall(Adiacente, adiacente(PosizioneCorrente, Adiacente, 1), MossePossibili),
@@ -34,7 +37,21 @@ move_follower(NemicoPos, GiocatorePos, NuovaPosizione) :-
     ).
 
 
-move_followers([],_,_,[]).
+/*move_follower(NemicoPos, GiocatorePos, NuovaPosizione) :-
+    (   vede_giocatore(NemicoPos, GiocatorePos) ->
+        retractall(memoria_ultima_posizione(NemicoPos, _)),
+        assertz(memoria_ultima_posizione(NemicoPos, GiocatorePos)),
+        a_star_prima_mossa(NemicoPos, GiocatorePos, NuovaPosizione)
+
+    ;   memoria_ultima_posizione(NemicoPos, UltimaVista) ->
+        a_star_prima_mossa(NemicoPos, UltimaVista, NuovaPosizione),
+        (NemicoPos == UltimaVista -> retractall(memoria_ultima_posizione(NemicoPos, _)) ; true)
+
+    ;   nemico_vaga(NemicoPos, NuovaPosizione)  % Se non ha memoria, vaga
+    ).*/
+
+
+move_followers([],_,[]).
 
 move_followers([H|T], P1Pos, [H1| T1]):-
     move_follower(H, P1Pos, H1),

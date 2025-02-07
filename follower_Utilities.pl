@@ -1,3 +1,5 @@
+:- dynamic memoria_ultima_posizione/2.
+
 % Movimento casuale del nemico
 nemico_vaga(PosizioneCorrente, NuovaPosizione) :-
     findall(Adiacente, adiacente(PosizioneCorrente, Adiacente, 1), MossePossibili),
@@ -26,10 +28,24 @@ percorso_libero_orizzontale(X1, X2, Y) :-
     MaxX is max(X1, X2),
     forall(between(MinX, MaxX, X), p(X/Y)).
 
-% Comportamento del nemico: vaga o insegue il giocatore
+/*% Comportamento del nemico: vaga o insegue il giocatore
 move_follower(NemicoPos, GiocatorePos, NuovaPosizione) :-
     (   vede_giocatore(NemicoPos, GiocatorePos) -> % se il nemico vede il giocatore allora lo insegue con A* senno continua a vagare
         a_star_prima_mossa(NemicoPos, GiocatorePos, NuovaPosizione)
+    ;   nemico_vaga(NemicoPos, NuovaPosizione)
+    ).*/
+
+
+move_follower(NemicoPos, GiocatorePos, NuovaPosizione) :-
+    (   vede_giocatore(NemicoPos, GiocatorePos) ->
+        retractall(memoria_ultima_posizione(NemicoPos, _)),
+        assertz(memoria_ultima_posizione(NemicoPos, GiocatorePos)),
+        a_star_prima_mossa(NemicoPos, GiocatorePos, NuovaPosizione)
+
+    ;   memoria_ultima_posizione(NemicoPos, UltimaVista) ->
+        a_star_prima_mossa(NemicoPos, UltimaVista, NuovaPosizione),
+        (NemicoPos == UltimaVista -> retractall(memoria_ultima_posizione(NemicoPos, _)) ; true)
+
     ;   nemico_vaga(NemicoPos, NuovaPosizione)
     ).
 
