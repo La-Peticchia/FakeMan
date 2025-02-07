@@ -56,6 +56,10 @@ move_camper(CamperPos,PlayerPos, BallList, NextPos):-
     assert(enemyTarget(NextPos, NextTarget, NextPath)).
 
 
+asdw(s,X1/Y,X2/Y) :- X2 is X1 + 1, p(X2/Y). % verso SUD
+asdw(a,X/Y1,X/Y2) :- Y2 is Y1 - 1, p(X/Y2). % verso OVEST
+asdw(w,X1/Y,X2/Y) :- X2 is X1 - 1, p(X2/Y). % verso NORD
+asdw(d,X/Y1,X/Y2) :- Y2 is Y1 + 1, p(X/Y2). % verso EST
 
 
 

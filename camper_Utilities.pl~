@@ -1,3 +1,5 @@
+:-[fakeman].
+:-[movimentopupi2].
 
 :- dynamic enemyTarget/3.
 
@@ -9,13 +11,13 @@ sort_by_distance(Pos1, List, OutList):-
 next_camper_target(CamperPos, BallList, Target):-
     %(seek(_,CamperPos,PlayerPos), Target = PlayerPos);
 
-    ((enemyTarget(CamperPos, n/a, _); enemyTarget(CamperPos,CamperPos, _)),
+    (enemyTarget(CamperPos, n/a, _),
      findall(Pos, (member(Pos,BallList), \+enemyTarget(_,Pos,_)), FreeBalls),
      (FreeBalls = [] -> sort_by_distance(CamperPos, BallList, [NearestBall|_]);
      sort_by_distance(CamperPos, FreeBalls, [NearestBall|_])),
      Target = NearestBall);
 
-    %(enemyTarget(CamperPos,CamperPos, _), Target = n/a);
+    (enemyTarget(CamperPos,CamperPos, _), Target = n/a);
 
     enemyTarget(CamperPos, Target, _).
 
