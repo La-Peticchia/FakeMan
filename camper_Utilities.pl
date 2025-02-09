@@ -48,12 +48,17 @@ move_campers([H|T], P1Pos, BallList, [H1| T1]):-
 
 move_camper(CamperPos,PlayerPos, BallList, NextPos):-
     ( \+enemyTarget(CamperPos,_,_) -> assert(enemyTarget(CamperPos , n/a, [])); true),
+    writeln(BallList),
     next_camper_target(CamperPos,BallList,Target),
     get_target_path(CamperPos,Target, [NextPos|NextPath]),
     (seek(_,NextPos,PlayerPos), NextTarget = PlayerPos ;NextTarget = Target),
     writeln(NextTarget),
     retractall(enemyTarget(CamperPos,_,_)),
-    assert(enemyTarget(NextPos, NextTarget, NextPath)).
+    assert(enemyTarget(NextPos, NextTarget, NextPath)),
+    findall(Pos, enemyTarget(Pos,_,_), List),
+    length(List, X),
+    writeln(X).
+
 
 
 asdw(s,X1/Y,X2/Y) :- X2 is X1 + 1, p(X2/Y). % verso SUD

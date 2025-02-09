@@ -7,7 +7,7 @@ import copy
 # Inizializza Pygame
 pygame.init()
 pygame.mixer.init()
- 
+
  # Costanti
 DIM_QUADRATO = 30         # Dimensione di un quadrato
 OFFSET = 5                # Spazio tra i quadrati
