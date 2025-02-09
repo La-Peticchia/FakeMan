@@ -30,10 +30,10 @@ a_star_search_prima_mossa([node(Pos, G, _, Path)|Open], Closed, Goal, C, TotPath
             F is GNew + H                           % Calcola il costo totale
         ),
         Neighbors
-    ),
+    ), 
     append(Open, Neighbors, NewOpen),
     sort(2, @=<, NewOpen, SortedOpen), % Ordina per F (minore � meglio)
-    a_star_search_prima_mossa(SortedOpen, [node(Pos, G, _, Path)|Closed], Goal, C, TotPath).
+    a_star_search_prima_mossa(SortedOpen, [node(Pos, G, _, Path)|Closed], Goal, C, TotPath), writeln("AAAA").
 
 
 % Adiacenze

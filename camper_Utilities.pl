@@ -3,22 +3,26 @@
 
 :- dynamic enemyTarget/3.
 
+
 sort_by_distance(Pos1, List, OutList):-
     findall((Dist, Pos), (member(Pos,List), a_star_costo(Pos1, Pos, Dist)), List1),
     sort(List1,List2),
+    
     findall(Pos2, member((_,Pos2), List2), OutList).
 
 next_camper_target(CamperPos, BallList, Target):-
+    
     %(seek(_,CamperPos,PlayerPos), Target = PlayerPos);
 
     (enemyTarget(CamperPos, n/a, _),
      findall(Pos, (member(Pos,BallList), \+enemyTarget(_,Pos,_)), FreeBalls),
-     (FreeBalls = [] -> sort_by_distance(CamperPos, BallList, [NearestBall|_]);
+     (FreeBalls = [] -> sort_by_distance(CamperPos, BallList, [NearestBall|_]);  
      sort_by_distance(CamperPos, FreeBalls, [NearestBall|_])),
-     Target = NearestBall);
+     Target = NearestBall); 
+     
 
     (enemyTarget(CamperPos,CamperPos, _), Target = n/a);
-
+    
     enemyTarget(CamperPos, Target, _).
 
 get_target_path(CamperPos, NewTarget, Path):-
@@ -50,9 +54,8 @@ move_camper(CamperPos,PlayerPos, BallList, NextPos):-
     ( \+enemyTarget(CamperPos,_,_) -> assert(enemyTarget(CamperPos , n/a, [])); true),
     writeln(BallList),
     next_camper_target(CamperPos,BallList,Target),
-    get_target_path(CamperPos,Target, [NextPos|NextPath]),
+    get_target_path(CamperPos,Target, [NextPos|NextPath]), 
     (seek(_,NextPos,PlayerPos), NextTarget = PlayerPos ;NextTarget = Target),
-    writeln(NextTarget),
     retractall(enemyTarget(CamperPos,_,_)),
     assert(enemyTarget(NextPos, NextTarget, NextPath)),
     findall(Pos, enemyTarget(Pos,_,_), List),
