@@ -42,9 +42,7 @@ play(Window, [@p1, P1Pos, P2Pos, BallList]) :-
 play(Window, [@p2, P1Pos, P2Pos, BallList]) :-
     writeln("p2 turn"),
     split_list(P2Pos, Followers, Campers),
-    writeln("Test1"),
     move_followers(Followers, P1Pos, NewFolPos),
-    writeln("Test2"),
 
     move_campers(Campers, P1Pos, BallList, NewCamPos),
     findall(Add, (playerPos(Add, _) , Add \= @p1), Enemies),
@@ -74,7 +72,7 @@ create_objects(Window) :-
     PX is X*20+2.5, PY is Y*20+2.5,
     send(Window, display,Player1, point(PX,PY)),
 
-    spawnEnemies(Window, [ 5/14, 14/12, 19/14, 18/7]),
+    spawnEnemies(Window, [ 5/13, 14/12, 18/11, 18/7]),
 
     spawnBalls(Window, 3).
 

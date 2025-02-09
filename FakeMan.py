@@ -43,7 +43,7 @@ def setInitialFlag():
     global MUSIC_ON
         
     MONSTER_GENERATION = True
-    MAX_MONSTER_NUMBER = 3
+    MAX_MONSTER_NUMBER = 4
     NUMBER_OF_TURN_INFRA_GENERATION = 5
     NUMBER_OF_PALLINI = 3
     IMMORTALITY = False
@@ -157,6 +157,7 @@ with open("PiastrelleNere.txt", "r") as file:
 
 #Funzione della generazione randomica dei pallini
 def disegna_Pallini():
+    prolog.retractall(f"ballPos(_)")
     for riga in range(RIGHE):
         for colonna in range(COLONNE): #due if anniadati
             if labirinto[riga][colonna] == 0: #valuto dove posso spawnare pallini
@@ -166,6 +167,9 @@ def disegna_Pallini():
         cell = random.choice(validCellGroup)
         if cell not in cellWithPallino:  # Controlla che il pallino non sia già stato aggiunto
             cellWithPallino.append(cell)
+            cellString = f"{cell[0]}/{cell[1]}"
+            prolog.assertz(f"ballPos({cellString})")
+
             
 #Disegno la scritta di restart
 def draw_restart_message():
@@ -253,27 +257,27 @@ def aggiorna_posizione_nemico(numMosse):
         start = f"{nemico_pos[0]}/{nemico_pos[1]}"
         goal = f"{player_pos[0]}/{player_pos[1]}"
         
-        queryCamper = f"move_camper({start}, {goal},{listaPallini}, NextPos)"
+        queryCamper = f"move_camper({start}, {goal}, NextPos)"
         queryFollow = f"move_follower({start}, {goal}, NuovaPosizione)"
         
         
-        resultCamper = list(prolog.query(queryCamper))
-        resultFollower = list(prolog.query(queryFollow))
-        
-        risultatoCamper = estrai_numeri(str(resultCamper))
-        risultatoFollow = estrai_numeri(str(resultFollower))
-        
-        #catturo l'eccezione che viene generata nell'eccessiva velocità del gioco
-        try:
-            [prologXCamper, prologYCamper] = risultatoCamper
-            
-        except Exception as e:
-            [prologXCamper, prologYCamper] = [risultatoCamper[0],risultatoCamper[1]]
-            
-        
-        [prologXFollow, prologYFollow] = risultatoFollow
-               
-        
+        # Aggiorna la posizione del nemico
+        if nemico_role == 0:
+            risultatoCamper = estrai_numeri(str(list(prolog.query(queryCamper))))
+       
+            #catturo l'eccezione che viene generata nell'eccessiva velocità del gioco
+            try:
+                [prologXCamper, prologYCamper] = risultatoCamper
+            except Exception as e:
+                [prologXCamper, prologYCamper] = [risultatoCamper[0],risultatoCamper[1]]
+
+            nemico["pos"] = [prologXCamper, prologYCamper]
+            print("^ Camper ^")            
+        else:
+            [prologXFollow, prologYFollow] = estrai_numeri(str(list(prolog.query(queryFollow))))  
+            nemico["pos"] = [prologXFollow, prologYFollow]
+            print("^ Follower ^")
+
         # Calcolo direzione per lo sprite
         if nemico_pos[1] > prologYCamper and nemico_dir == 0:
             nemico["sprite"] = pygame.transform.flip(nemico_sprite, True, False)
@@ -282,13 +286,6 @@ def aggiorna_posizione_nemico(numMosse):
             nemico["sprite"] = pygame.transform.flip(nemico_sprite, True, False)
             nemico["direction"] = 0
         
-        # Aggiorna la posizione del nemico
-        if nemico_role == 0:
-            nemico["pos"] = [prologXCamper, prologYCamper]
-            
-        else:
-            nemico["pos"] = [prologXFollow, prologYFollow]
-            
         
     numMosse = numMosse +1
     

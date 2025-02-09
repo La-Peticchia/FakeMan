@@ -42,9 +42,7 @@ play(Window, [@p1, P1Pos, P2Pos, BallList]) :-
 play(Window, [@p2, P1Pos, P2Pos, BallList]) :-
     writeln("p2 turn"),
     split_list(P2Pos, Followers, Campers),
-    writeln("Test1"),
     move_followers(Followers, P1Pos, NewFolPos),
-    writeln("Test2"),
 
     move_campers(Campers, P1Pos, BallList, NewCamPos),
     findall(Add, (playerPos(Add, _) , Add \= @p1), Enemies),
@@ -68,7 +66,7 @@ movePlayer(Window, Player, Y/X):-
 
 create_objects(Window) :-
     Player1 = @p1, X/Y = 1/1,
-    assert(playerPos(Player1, Y/X)),
+    assertz(playerPos(Player1, Y/X)),
     new(Player1, box(15,15)),
     send(Player1, fill_pattern, colour(blue)),
     PX is X*20+2.5, PY is Y*20+2.5,
