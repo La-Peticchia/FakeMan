@@ -43,12 +43,12 @@ def setInitialFlag():
     global MUSIC_ON
         
     MONSTER_GENERATION = True
-    MAX_MONSTER_NUMBER = 4
-    NUMBER_OF_TURN_INFRA_GENERATION = 5
-    NUMBER_OF_PALLINI = 3
+    MAX_MONSTER_NUMBER = 16
+    NUMBER_OF_TURN_INFRA_GENERATION = 20
+    NUMBER_OF_PALLINI = 50
     IMMORTALITY = False
     SOUND_ON = True
-    MUSIC_ON = True
+    MUSIC_ON = False
 
 setInitialFlag()
 
@@ -78,7 +78,7 @@ sprite_enemy3 = pygame.image.load("immagini/Rosso.png")
 sprite_enemy3 = pygame.transform.scale(sprite_enemy3, (DIM_QUADRATO, DIM_QUADRATO))
 
 #Sprite pallino
-sprite_pallino = pygame.image.load("immagini/pallino.png")
+sprite_pallino = pygame.image.load("immagini/pallinoFico.png")
 sprite_pallino = pygame.transform.scale(sprite_pallino, (DIM_QUADRATO, DIM_QUADRATO))
 
 #Sprite Scritta win
@@ -119,7 +119,7 @@ player_pos_memory = player_pos.copy() #copia delle posizioni iniziali
 nemici = [
     {"pos": [0, 1], "sprite": sprite_enemy1, "direction": 0, "role": 0}, #0 camper. 1 follower 
     {"pos": [0, 19], "sprite": sprite_enemy2, "direction": 0, "role": 1}
-    #{"pos": [13, 0], "sprite": sprite_enemy3, "direction": 0}
+    #{"pos": [13, 0], "sprite": sprite_enemy3, "direction": 0, "role": 1}
 ]
 
 #Copia backup per restart
@@ -199,11 +199,7 @@ def disegna_griglia():
             if [riga, colonna] == player_pos:
                 schermo.blit(sprite_player, (x, y))
                     
-              # Disegna tutti i nemici
-            for nemico in nemici:
-                if [riga, colonna] == nemico["pos"]:
-                    schermo.blit(nemico["sprite"], (x, y))
-                             
+            # Disegna tutti i nemici
             for cella in cellWithPallino:
                 if[riga,colonna] == cella:
                     schermo.blit(sprite_pallino, (x, y))
@@ -213,6 +209,14 @@ def disegna_griglia():
                         if SOUND_ON and pallinePrese < NUMBER_OF_PALLINI:
                             Coin_Sound.set_volume(0.5)    
                             Coin_Sound.play()
+              
+                
+            for nemico in nemici:
+                if [riga, colonna] == nemico["pos"]:
+                    schermo.blit(nemico["sprite"], (x, y))
+                    
+                             
+            
                                              
     if pallinePrese == NUMBER_OF_PALLINI:
         stopCondition = True
@@ -314,7 +318,7 @@ def musica_casuale():
     global GameSounds
     global music
     music = random.choice(GameSounds)
-    music.set_volume(0.5)
+    music.set_volume(0.05)
     music.play()
     
 if MUSIC_ON:
@@ -333,6 +337,7 @@ def restart():
     global player_pos_memory
     global nemici_memory
     global numeroMosse
+    global music
     
     player_pos = player_pos_memory.copy()
     
@@ -343,8 +348,8 @@ def restart():
                  for enemy in nemici_memory]
     
     stopCondition = False
-    gameOverPlayer = True
-    winPlayed = True
+    gameOverPlayer = False
+    winPlayed = False
     numeroMosse = 0
     pallinePrese = 0
     if cellWithPallino:
@@ -353,6 +358,7 @@ def restart():
     disegna_griglia()
     setInitialFlag()
     if MUSIC_ON:
+        music.stop()
         musica_casuale()
 
 #Funzione di supporto 
