@@ -45,10 +45,10 @@ def setInitialFlag():
     MONSTER_GENERATION = True
     MAX_MONSTER_NUMBER = 16
     NUMBER_OF_TURN_INFRA_GENERATION = 20
-    NUMBER_OF_PALLINI = 50
+    NUMBER_OF_PALLINI = 8
     IMMORTALITY = False
     SOUND_ON = True
-    MUSIC_ON = True
+    MUSIC_ON = False
 
 setInitialFlag()
 
@@ -118,7 +118,7 @@ player_pos_memory = player_pos.copy() #copia delle posizioni iniziali
 #array che contiene tutti i dati dei nemici iniziali (e quelli futuri)
 nemici = [
     {"pos": [0, 1], "sprite": sprite_enemy1, "direction": 0, "role": 0}, #0 camper. 1 follower 
-    {"pos": [0, 19], "sprite": sprite_enemy2, "direction": 0, "role": 1}
+    {"pos": [0, 19], "sprite": sprite_enemy3, "direction": 0, "role": 1}
     #{"pos": [13, 0], "sprite": sprite_enemy3, "direction": 0, "role": 1}
 ]
 
@@ -215,9 +215,7 @@ def disegna_griglia():
                 if [riga, colonna] == nemico["pos"]:
                     schermo.blit(nemico["sprite"], (x, y))
                     
-                             
-            
-                                             
+                                       
     if pallinePrese == NUMBER_OF_PALLINI:
         stopCondition = True
         x = (LARGHEZZA_FINESTRA - sprite_win.get_width()) // 2
@@ -250,7 +248,6 @@ def disegna_griglia():
 #Funzione per aggiornare il movimento del nemico
 def aggiorna_posizione_nemico(numMosse):
     global cellWithPallino
-    listaPallini = convertiProlog(cellWithPallino)
     for nemico in nemici:
         nemico_pos = nemico["pos"]
         nemico_sprite = nemico["sprite"]
@@ -265,8 +262,8 @@ def aggiorna_posizione_nemico(numMosse):
         queryFollow = f"move_follower({start}, {goal}, NuovaPosizione)"
         
         
-        # Aggiorna la posizione del nemico
-        if nemico_role == 0:
+        # Aggiorna la posizione del nemico 
+        if nemico_role == 0: #se è camper
             risultatoCamper = estrai_numeri(str(list(prolog.query(queryCamper))))
        
             #catturo l'eccezione che viene generata nell'eccessiva velocità del gioco
@@ -276,11 +273,11 @@ def aggiorna_posizione_nemico(numMosse):
                 [prologXCamper, prologYCamper] = [risultatoCamper[0],risultatoCamper[1]]
 
             nemico["pos"] = [prologXCamper, prologYCamper]
-            print("^ Camper ^")            
+                      
         else:
             [prologXFollow, prologYFollow] = estrai_numeri(str(list(prolog.query(queryFollow))))  
             nemico["pos"] = [prologXFollow, prologYFollow]
-            print("^ Follower ^")
+            
 
         # Calcolo direzione per lo sprite
         if nemico_pos[1] > prologYCamper and nemico_dir == 0:
@@ -297,15 +294,24 @@ def aggiorna_posizione_nemico(numMosse):
 
 def aggiungi_nemico():
     global nemici
-    role = random.sample([0,1],1)[0]
+    role = random.choice([0,1])
+    
     if len(nemici)< MAX_MONSTER_NUMBER:
+        if role == 0:
+            sprite = random.choice([spriteGroup[0],spriteGroup[1]])
+            print("aggiunto camper")
+        else:
+            sprite = spriteGroup[2]
+            print("aggiunto follower")
+            
         nuovo_nemico = {
             "pos" : random.choice(posGroup),
-            "sprite" : random.choice(spriteGroup),
+            "sprite" : sprite,
             "direction" : 0,
             "role" : role
             
         }
+            
         nemici.append(nuovo_nemico)
         
   
@@ -361,10 +367,7 @@ def restart():
         music.stop()
         musica_casuale()
 
-#Funzione di supporto 
-def convertiProlog(lista):
-    nuova_lista = [f"{x}/{y}" for x, y in lista]
-    return nuova_lista
+
 
 ############################################### Inizio Loop di gioco ############################################################################    
     
