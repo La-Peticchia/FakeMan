@@ -48,7 +48,7 @@ def setInitialFlag():
     NUMBER_OF_PALLINI = 8
     IMMORTALITY = False
     SOUND_ON = True
-    MUSIC_ON = False
+    MUSIC_ON = True
 
 setInitialFlag()
 
