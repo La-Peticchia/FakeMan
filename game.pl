@@ -1,16 +1,18 @@
 :-use_module(library(pce)).
-%:-[mappa_logica].
+:-[fakeman].
 :-[mappa_grafica].
 :-[rules].
 :-[alphabeta].
 
 :- dynamic playerPos/2.
 :- dynamic ballPos/2.
+:- dynamic pos/1.
 
 play :-
     Window = @a,
     free_objects(Window),
     disegna_pianta(Window, "Test"),
+    send(Window, recogniser, handler(event(keyboard), message(@prolog, key_pressed, @event?key))),
     create_objects(Window),
     playerPos(@p1,P1Pos),
     findall(X/Y, (playerPos(Add, X/Y) , Add \= @p1), P2Pos),
@@ -18,8 +20,11 @@ play :-
     play(Window,[@p1, P1Pos, P2Pos, play, List]).
 
 play(Window, [@p1, P1Pos, P2Pos, play, BallList]):-
-    writeln("move"),
-    read(Dir), nl,
+    send(Window, flush),
+    sleep(1),
+    (\+pos(_), play(Window, [@p1, P1Pos, P2Pos, play, BallList]);true),
+    pos(Dir),
+    retractall(pos(_)),
     (
      asdw(Dir,P1Pos, NewP1Pos),
      movePlayer(Window, @p1, NewP1Pos),
@@ -72,7 +77,8 @@ create_objects(Window) :-
     PX is X*20+2.5, PY is Y*20+2.5,
     send(Window, display,Player1, point(PX,PY)),
 
-    spawnEnemies(Window, [19/14, 18/7, 0/13]),
+    %spawnEnemies(Window, [19/14, 18/7, 0/13]),
+    spawnEnemies(Window, [19/14, 18/7]),
 
     spawnBalls(Window, 3).
 
@@ -126,4 +132,7 @@ asdw(w,X/Y1,X/Y2) :- Y2 is Y1 - 1, pInv(X/Y2). % verso NORD
 asdw(a,X1/Y,X2/Y) :- X2 is X1 - 1, pInv(X2/Y). % verso OVEST
 asdw(s,X/Y1,X/Y2) :- Y2 is Y1 + 1, pInv(X/Y2). % verso SUD
 
-
+key_pressed(Tasto) :-
+    \+pos(_),
+    writeln(Tasto),
+    assertz(pos(Tasto)).
