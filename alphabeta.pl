@@ -11,9 +11,10 @@ alfabeta(Pos,Alfa,Beta,Depth,MigliorPosSucc,Val) :-% Pos ha MigliorPosSucc se
   ;                                                        % altrimenti
   payoff(Pos,Val).  % Pos è terminale e restituisce l'utilità come Val
 
-% migliore(+Lista,+Alfa,+Beta,-MigliorPosSucc,-Val) ===================
-% restituisce MigliorPosSucc da una Lista di possibili successori
-% ed il suo Val rimanendo sempre dentro i limiti Alfa e Beta
+% migliore(+Lista,+Alfa,+Beta,+Depth,-MigliorPosSucc,-Val)
+% =================== restituisce MigliorPosSucc da una Lista di
+% possibili successori ed il suo Val rimanendo sempre dentro i limiti
+% Alfa e Beta
 migliore([Pos|AltrePos],Alfa,Beta,Depth,MigliorPosSucc,MigliorVal) :-
   alfabeta(Pos,Alfa,Beta,Depth, _,Val),       % determina Val associato a Pos
   pota(AltrePos,Alfa,Beta,Depth,Pos,Val,MigliorPosSucc,MigliorVal).

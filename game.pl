@@ -34,7 +34,7 @@ play(Window, [@p1, P1Pos, P2Pos, play, BallList]):-
      ),
      delete(BallList, NewP1Pos, NewBallList),
     (
-         NewBallList = [] -> writeln("You Win");
+         NewBallList = [], writeln("You Win");
          play(Window,[@p2, NewP1Pos, P2Pos, play, NewBallList])
      )
 
@@ -51,7 +51,7 @@ play(Window, [@p2, P1Pos, P2Pos, play, BallList]):-
     findall(Add, (playerPos(Add, _) , Add \= @p1), Enemies),
     moveEnemies(Window, Enemies, NewP2Pos),
     (
-        check_list_adiacent1(NewP2Pos, P1Pos) -> writeln("You Lose"), true;
+        check_list_adjacent1(NewP2Pos, P1Pos), writeln("You Lose");
         play(Window,[@p1, P1Pos, NewP2Pos, play, BallList])
     ).
 

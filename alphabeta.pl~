@@ -9,7 +9,7 @@ alfabeta(Pos,Alfa,Beta,Depth,MigliorPosSucc,Val) :-% Pos ha MigliorPosSucc se
   !,                                                  % e la migliore è
   migliore(ListaPosSucc,Alfa,Beta,NewDepth,MigliorPosSucc,Val)  % MigliorPosSucc
   ;                                                        % altrimenti
-  utility(Pos,Val).  % Pos è terminale e restituisce l'utilità come Val
+  payoff(Pos,Val).  % Pos è terminale e restituisce l'utilità come Val
 
 % migliore(+Lista,+Alfa,+Beta,-MigliorPosSucc,-Val) ===================
 % restituisce MigliorPosSucc da una Lista di possibili successori
