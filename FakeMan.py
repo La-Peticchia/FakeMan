@@ -324,7 +324,7 @@ def musica_casuale():
     global GameSounds
     global music
     music = random.choice(GameSounds)
-    music.set_volume(0.05)
+    music.set_volume(0.1)
     music.play()
     
 if MUSIC_ON:
